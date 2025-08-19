@@ -1,8 +1,8 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 declare class AuthenticationService {
     constructor();
-    signup: (req: Request, res: Response, next: NextFunction) => Response;
-    login: (req: Request, res: Response, next: NextFunction) => Response;
+    signup: (req: Request, res: Response) => Response;
+    login: (req: Request, res: Response) => Response;
 }
 declare const _default: AuthenticationService;
 export default _default;
