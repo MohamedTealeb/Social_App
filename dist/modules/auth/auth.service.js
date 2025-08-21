@@ -37,14 +37,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const validators = __importStar(require("./auth.validation"));
 class AuthenticationService {
     constructor() { }
-    signup = (req, res) => {
-        try {
-            validators.signup.body.parse(req.body);
-        }
-        catch (error) {
-            return res.status(201).json({
-                error, messsage: JSON.parse(error)
-            });
+    signup = async (req, res) => {
+        const validationResult = await validators.signup.body.safeParseAsync(req.body);
+        if (!validationResult.success) {
+            return res.json({ validationResult });
         }
         let { username, email, password, phone, gender } = req.body;
         console.log({ username, email, password, phone, gender });

@@ -5,6 +5,7 @@ export declare const signup: {
         email: z.ZodEmail;
         password: z.ZodString;
         confirmPassword: z.ZodString;
-    }, z.core.$strip>;
+        phone: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>;
 };
 //# sourceMappingURL=auth.validation.d.ts.map

@@ -4,16 +4,12 @@ import { ISignupBodyInputs } from './dto/auth.dto';
 import * as validators from './auth.validation'
 class AuthenticationService{
     constructor(){}
-        signup=(req:Request,res:Response):Response=>{
-            try{
-validators.signup.body.parse(req.body);
-
-            }catch(error:any){
-                return res.status(201).json({
-                    error,messsage:JSON.parse(error)
-                })
+        signup=async(req:Request,res:Response):Promise<Response>=>{
+        
+      const validationResult =await validators.signup.body.safeParseAsync(req.body);
+            if(!validationResult.success){
+                return res.json({validationResult})
             }
-            
             
            let {username,email,password,phone,gender}:ISignupBodyInputs=req.body
             console.log({username,email,password,phone,gender})

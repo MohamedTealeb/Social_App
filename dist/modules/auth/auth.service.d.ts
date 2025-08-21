@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 declare class AuthenticationService {
     constructor();
-    signup: (req: Request, res: Response) => Response;
+    signup: (req: Request, res: Response) => Promise<Response>;
     login: (req: Request, res: Response) => Response;
 }
 declare const _default: AuthenticationService;
