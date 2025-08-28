@@ -1,0 +1,62 @@
+
+
+import { Types,Schema, models, model } from "mongoose"
+
+
+export enum GenderEnum{
+male="male",
+female="female"
+}
+export enum RoleEnum{
+user="user",
+admin="admin"
+}
+export interface IUser{
+    _id:Types.ObjectId;
+    firstName: string;
+    lastName:string;
+    username?:string;
+    email:string;
+    confrimEmailOtp?:string;
+    confirmAt:Date;
+    password:string;
+    resetPasswordOtp?:string;
+    changeCredentialTime?:Date;
+    phone?:string;
+    address?:string;
+    gender:GenderEnum;
+    role:RoleEnum;
+    createdAt:Date;
+    updatedAt?:Date;
+}
+
+const userSchema=new Schema<IUser>({
+
+    firstName:{type:String,required:true,minLength:2,maxLength:25}, 
+    lastName:{type:String,required:true,minLength:2,maxLength:25},
+   
+    email:{type:String,required:true,unique:true},
+    confrimEmailOtp:{type:String},
+    confirmAt:{type:Date},
+    password:{type:String,required:true},
+    resetPasswordOtp:{type:String},
+    changeCredentialTime:{type:Date},
+    phone:{type:String},
+    address:{type:String},
+    gender:{type:String,enum:GenderEnum,default:GenderEnum.male},
+    role:{type:String,enum:RoleEnum,default:RoleEnum.user},
+    
+
+},{
+    timestamps:true,
+    toJSON:{virtuals:true},
+    toObject:{virtuals:true}
+})
+
+userSchema.virtual("username").set(function(value:string){
+ const [firstName,LastName]=value.split(" ")||[];
+ this.set({firstName,LastName})
+}).get(function(){
+    return this.firstName + " " + this.lastName
+})
+export const UserModel=models.User||model<IUser>("User",userSchema)

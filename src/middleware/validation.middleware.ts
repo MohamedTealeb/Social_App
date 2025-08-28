@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 
-import { ZodType } from 'zod';
+import z, { ZodType } from 'zod';
 type KetReqType = keyof Request
 type SchemaType = Partial<Record<KetReqType,ZodType>>
+
 export const validation =(schema:SchemaType)=>{
 
     return(req:Request,res:Response,next:NextFunction):Response|NextFunction=>{
@@ -27,4 +28,19 @@ const errors:{key:KetReqType,issue:{path:string|number|symbol|undefined,message:
         }
    return next() as unknown as NextFunction;
 }
+}
+
+
+export const generalFields={
+
+ username:z.string({
+    error:"username is requird"
+ }).min(2,{error:"min username length is 2"}).max(20,{error:"max username length is 20"}),
+ email:z.email({
+    error   :"email is requird"
+ }),
+ password:z.string().regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
+ confirmPassword:z.string()
+
+
 }

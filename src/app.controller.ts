@@ -8,6 +8,7 @@ import authController from'./modules/auth/auth.controller';
 import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
 import { globalErrorHandling } from './utils/response/error.response';
+import connectDB from './DB/connections.db';
 
 
 
@@ -39,6 +40,7 @@ app.use('{/*dummy}',(req:Request,res:Response,next:NextFunction)=>{
       message:"The requested resource was not found on this server."
    })
 })
+await connectDB()
 app.use(globalErrorHandling)
 app.listen(port,()=>{
 console.log(`Server is running on port ${port} `);})

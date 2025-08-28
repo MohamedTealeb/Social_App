@@ -8,4 +8,11 @@ export declare const signup: {
         phone: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>;
 };
+export declare const login: {
+    body: z.ZodObject<{
+        email: z.ZodEmail;
+        password: z.ZodString;
+        confirmPassword: z.ZodString;
+    }, z.core.$strict>;
+};
 //# sourceMappingURL=auth.validation.d.ts.map

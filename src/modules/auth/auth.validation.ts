@@ -1,4 +1,5 @@
 import {z} from "zod"
+import { generalFields } from "../../middleware/validation.middleware"
 
 
 export const signup={
@@ -8,14 +9,22 @@ export const signup={
 
 
     body:z.strictObject({
-        username:z.string().min(2).max(20),
-        email:z.email(),
-        password:z.string(),
-        confirmPassword:z.string(),
+        username:generalFields.username,
+        email:generalFields.email,
+        password:generalFields.password,
+        confirmPassword:generalFields.confirmPassword,
         phone:z.string().optional(),
     }).refine(data=>{
         return data.password === data.confirmPassword
     },{
         error:"Passwords do not match"
     }),
+}
+
+export const login={
+    body:z.strictObject({
+        email:generalFields,
+        password:generalFields.password,
+       confirmPassword:generalFields.confirmPassword,
+    })
 }

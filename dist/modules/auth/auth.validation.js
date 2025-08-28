@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signup = void 0;
+exports.login = exports.signup = void 0;
 const zod_1 = require("zod");
 exports.signup = {
     // query:z.strictObject({
@@ -17,5 +17,12 @@ exports.signup = {
     }, {
         error: "Passwords do not match"
     }),
+};
+exports.login = {
+    body: zod_1.z.strictObject({
+        email: zod_1.z.email(),
+        password: zod_1.z.string(),
+        confirmPassword: zod_1.z.string(),
+    })
 };
 //# sourceMappingURL=auth.validation.js.map

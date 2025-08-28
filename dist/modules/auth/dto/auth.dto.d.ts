@@ -1,3 +1,5 @@
+import * as validtors from "../auth.validation";
+import { z } from "zod";
 export interface ISignupBodyInputs {
     username: string;
     email: string;
@@ -5,4 +7,5 @@ export interface ISignupBodyInputs {
     phone: string;
     gender: string;
 }
+export type ISignupBody = z.infer<typeof validtors.signup.body>;
 //# sourceMappingURL=auth.dto.d.ts.map

@@ -12,6 +12,7 @@ const auth_controller_1 = __importDefault(require("./modules/auth/auth.controlle
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
+const connections_db_1 = __importDefault(require("./DB/connections.db"));
 const bootstrap = async () => {
     const port = process.env.PORT || 5000;
     const app = (0, express_1.default)();
@@ -38,6 +39,7 @@ const bootstrap = async () => {
             message: "The requested resource was not found on this server."
         });
     });
+    await (0, connections_db_1.default)();
     app.use(error_response_1.globalErrorHandling);
     app.listen(port, () => {
         console.log(`Server is running on port ${port} `);
