@@ -1,6 +1,15 @@
 import type { Request, Response } from 'express';
 declare class AuthenticationService {
+    private userModel;
     constructor();
+    /**
+     *
+     *  @param req Exress.Request
+     *  @param res Express.Response
+     *  @return Promise<Express.Response>
+     *  @example()
+     * return {messae: "Done",status:201,data:{}}
+     */
     signup: (req: Request, res: Response) => Promise<Response>;
     login: (req: Request, res: Response) => Response;
 }

@@ -9,11 +9,13 @@ export const signup={
 
 
     body:z.strictObject({
-        username:generalFields.username,
+        firstName:generalFields.firstName,
+        lastName:generalFields.lastName,
         email:generalFields.email,
         password:generalFields.password,
         confirmPassword:generalFields.confirmPassword,
         phone:z.string().optional(),
+      gender: generalFields.gender
     }).refine(data=>{
         return data.password === data.confirmPassword
     },{
@@ -23,7 +25,7 @@ export const signup={
 
 export const login={
     body:z.strictObject({
-        email:generalFields,
+        email:generalFields.email,
         password:generalFields.password,
        confirmPassword:generalFields.confirmPassword,
     })

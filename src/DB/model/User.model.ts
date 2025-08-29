@@ -24,7 +24,7 @@ export interface IUser{
     changeCredentialTime?:Date;
     phone?:string;
     address?:string;
-    gender:GenderEnum;
+    gender?:GenderEnum;
     role:RoleEnum;
     createdAt:Date;
     updatedAt?:Date;

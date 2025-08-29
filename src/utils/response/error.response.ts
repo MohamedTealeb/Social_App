@@ -21,7 +21,16 @@ export class BadReauest extends AppError{
         super(message,400,cause)
     }
 }
-
+export class Notfound extends AppError{
+    constructor(message:string,cause?:unknown){
+        super(message,404,cause)
+    }
+}
+export class ConflictException extends AppError{
+    constructor(message:string,cause?:unknown){
+        super(message,409,cause)
+    }
+}
 export const globalErrorHandling = (error:IError,req:Request,res:Response,next:NextFunction)=>{
    
    return res.status(error.statusCode||500).json({

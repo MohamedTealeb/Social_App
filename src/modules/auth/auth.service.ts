@@ -1,22 +1,45 @@
 import type { Request,Response } from 'express';
-import { ISignupBodyInputs } from './dto/auth.dto';
+import { ISignupBody } from './dto/auth.dto';
 // import {  BadReauest } from '../../utils/response/error.response';
-import * as validators from './auth.validation'
+import {  UserModel } from '../../DB/model/User.model';
+import { BadReauest, ConflictException } from '../../utils/response/error.response';
+import { UserRepository } from '../../DB/repository/user.reository';
 class AuthenticationService{
+    private  userModel =new UserRepository(UserModel)
     constructor(){}
+
+    /**
+     * 
+     *  @param req Exress.Request
+     *  @param res Express.Response
+     *  @return Promise<Express.Response>
+     *  @example()
+     * return {messae: "Done",status:201,data:{}}
+     */
         signup=async(req:Request,res:Response):Promise<Response>=>{
         
-      const validationResult =await validators.signup.body.safeParseAsync(req.body);
-            if(!validationResult.success){
-                return res.json({validationResult})
+     
+           let {firstName,lastName,email,password}:ISignupBody=req.body
+            console.log({firstName,lastName,email,password})
+            const checkUserExist=await this.userModel.findOne({
+                filter:{email},
+                select:"email"
+            })
+            if(checkUserExist){
+                throw new ConflictException("email already exists")
             }
             
-           let {username,email,password,phone,gender}:ISignupBodyInputs=req.body
-            console.log({username,email,password,phone,gender})
+            const user=await this.userModel.creaeUser({
+                data:[{firstName,lastName,email,password}]
+            })
+
+        if(!user){
+            throw new BadReauest("fail")
+        }
             // throw new BadReauest("Fail in auth",400);
             return res.status(201).json({
                 message:"User created successfully",
-                data:req.body
+                data:{user}
             })
         }
         login=(req:Request,res:Response):Response=>{

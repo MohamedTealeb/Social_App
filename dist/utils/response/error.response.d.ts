@@ -11,6 +11,12 @@ export declare class AppError extends Error {
 export declare class BadReauest extends AppError {
     constructor(message: string, cause?: unknown);
 }
+export declare class Notfound extends AppError {
+    constructor(message: string, cause?: unknown);
+}
+export declare class ConflictException extends AppError {
+    constructor(message: string, cause?: unknown);
+}
 export declare const globalErrorHandling: (error: IError, req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
 export {};
 //# sourceMappingURL=error.response.d.ts.map
