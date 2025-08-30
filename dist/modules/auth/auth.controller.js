@@ -42,6 +42,7 @@ const validators = __importStar(require("./auth.validation"));
 const express_1 = require("express");
 const router = (0, express_1.Router)();
 router.post("/signup", (0, validation_middleware_1.validation)(validators.signup), auth_service_1.default.signup);
-router.post("/login", auth_service_1.default.login);
+router.post("/login", (0, validation_middleware_1.validation)(validators.login), auth_service_1.default.login);
+router.patch("/confirm-email", (0, validation_middleware_1.validation)(validators.confirmEmail), auth_service_1.default.confirmEmail);
 exports.default = router;
 //# sourceMappingURL=auth.controller.js.map

@@ -1,9 +1,12 @@
 import type { Request,Response } from 'express';
-import { ISignupBody } from './dto/auth.dto';
+import { IConfirmEmail, ISignupBody } from './dto/auth.dto';
 // import {  BadReauest } from '../../utils/response/error.response';
 import {  UserModel } from '../../DB/model/User.model';
-import { BadReauest, ConflictException } from '../../utils/response/error.response';
+import { BadReauest, ConflictException, Notfound } from '../../utils/response/error.response';
 import { UserRepository } from '../../DB/repository/user.reository';
+import { CompareHash, generateHash } from '../../utils/security/hash.security';
+import { emailEvent } from '../../utils/event/email.event';
+import { generateNumberOtp } from '../../utils/otp';
 class AuthenticationService{
     private  userModel =new UserRepository(UserModel)
     constructor(){}
@@ -28,14 +31,19 @@ class AuthenticationService{
             if(checkUserExist){
                 throw new ConflictException("email already exists")
             }
+            const otp=generateNumberOtp()
             
             const user=await this.userModel.creaeUser({
-                data:[{firstName,lastName,email,password}]
+                data:[{firstName,lastName,email,password:await generateHash(password),confrimEmailOtp:await generateHash(String(otp))}]
             })
 
         if(!user){
             throw new BadReauest("fail")
         }
+       emailEvent.emit("confirmEmail",{
+            to:email,
+          otp
+        })
             // throw new BadReauest("Fail in auth",400);
             return res.status(201).json({
                 message:"User created successfully",
@@ -43,6 +51,33 @@ class AuthenticationService{
             })
         }
         login=(req:Request,res:Response):Response=>{
+            return res.status(200).json({
+                message:"Done",
+                data:req.body
+            })
+        }
+        confirmEmail=async(req:Request,res:Response):Promise<Response>=>{
+
+            const {email,otp}:IConfirmEmail=req.body
+            const user=await this.userModel.findOne({
+                filter:{email,confrimEmailOtp:{$exists:true},confirmAt:{$exists:false}},
+               
+            })
+            if(!user){
+                throw new Notfound("Invalid account")
+            }
+            if(!await CompareHash(otp,user.confrimEmailOtp as string)){
+                throw new ConflictException("Invalid confirmation code")
+            }
+            await this.userModel.updateOne({
+                filter:{email},
+                update:{
+                    confirmAt:new Date(),
+                    $unset:{
+                        confrimEmailOtp:true
+                    }
+                },
+            })
             return res.status(200).json({
                 message:"Done",
                 data:req.body

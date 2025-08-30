@@ -48,7 +48,8 @@ export const generalFields={
  }),
  password:z.string().min(6,{error:"min password length is 6"}),
  confirmPassword:z.string(),
-gender: z.nativeEnum(GenderEnum).optional()
+gender: z.nativeEnum(GenderEnum).optional(),
+otp:z.string().regex(/^\d{6}$/)
 
 
 }

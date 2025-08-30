@@ -17,4 +17,10 @@ export declare const login: {
         confirmPassword: z.ZodString;
     }, z.core.$strict>;
 };
+export declare const confirmEmail: {
+    body: z.ZodObject<{
+        email: z.ZodEmail;
+        otp: z.ZodString;
+    }, z.core.$strict>;
+};
 //# sourceMappingURL=auth.validation.d.ts.map

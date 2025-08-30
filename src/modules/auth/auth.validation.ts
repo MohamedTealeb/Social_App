@@ -30,3 +30,10 @@ export const login={
        confirmPassword:generalFields.confirmPassword,
     })
 }
+export const confirmEmail={
+    body:z.strictObject({
+        email:generalFields.email,
+        otp:generalFields.otp
+})
+}
+

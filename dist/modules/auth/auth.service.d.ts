@@ -12,6 +12,7 @@ declare class AuthenticationService {
      */
     signup: (req: Request, res: Response) => Promise<Response>;
     login: (req: Request, res: Response) => Response;
+    confirmEmail: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: AuthenticationService;
 export default _default;

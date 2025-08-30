@@ -12,6 +12,7 @@ export declare const generalFields: {
     password: z.ZodString;
     confirmPassword: z.ZodString;
     gender: z.ZodOptional<z.ZodEnum<typeof GenderEnum>>;
+    otp: z.ZodString;
 };
 export {};
 //# sourceMappingURL=validation.middleware.d.ts.map

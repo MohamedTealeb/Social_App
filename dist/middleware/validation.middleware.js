@@ -47,6 +47,7 @@ exports.generalFields = {
     }),
     password: zod_1.default.string().min(6, { error: "min password length is 6" }),
     confirmPassword: zod_1.default.string(),
-    gender: zod_1.default.nativeEnum(User_model_1.GenderEnum).optional()
+    gender: zod_1.default.nativeEnum(User_model_1.GenderEnum).optional(),
+    otp: zod_1.default.string().regex(/^\d{6}$/)
 };
 //# sourceMappingURL=validation.middleware.js.map
