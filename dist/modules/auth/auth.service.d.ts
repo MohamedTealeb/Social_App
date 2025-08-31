@@ -11,7 +11,7 @@ declare class AuthenticationService {
      * return {messae: "Done",status:201,data:{}}
      */
     signup: (req: Request, res: Response) => Promise<Response>;
-    login: (req: Request, res: Response) => Response;
+    login: (req: Request, res: Response) => Promise<Response>;
     confirmEmail: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: AuthenticationService;

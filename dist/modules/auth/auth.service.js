@@ -7,6 +7,7 @@ const user_reository_1 = require("../../DB/repository/user.reository");
 const hash_security_1 = require("../../utils/security/hash.security");
 const email_event_1 = require("../../utils/event/email.event");
 const otp_1 = require("../../utils/otp");
+const token_security_1 = require("../../utils/security/token.security");
 class AuthenticationService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
     constructor() { }
@@ -45,10 +46,33 @@ class AuthenticationService {
             data: { user }
         });
     };
-    login = (req, res) => {
+    login = async (req, res) => {
+        const { email, password } = req.body;
+        const user = await this.userModel.findOne({
+            filter: { email }
+        });
+        if (!user) {
+            throw new error_response_1.Notfound("invalid login data");
+        }
+        if (!user.confirmAt) {
+            throw new error_response_1.BadReauest("verify your acc first");
+        }
+        if (!(await (0, hash_security_1.CompareHash)(password, user.password))) {
+            throw new error_response_1.Notfound("invalid login data");
+        }
+        const access_token = await (0, token_security_1.generarteToken)({
+            payload: { _id: user._id },
+        });
+        const refresh_token = await (0, token_security_1.generarteToken)({
+            payload: { _id: user._id },
+            secret: process.env.REFRESH_USER_TOKEN_SIGNATURE,
+            options: { expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN) }
+        });
         return res.status(200).json({
             message: "Done",
-            data: req.body
+            data: { Credentials: {
+                    access_token, refresh_token
+                } }
         });
     };
     confirmEmail = async (req, res) => {
