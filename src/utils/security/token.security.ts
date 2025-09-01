@@ -5,7 +5,7 @@ import { HUserDocument, RoleEnum, UserModel } from '../../DB/model/User.model'
 import { BadReauest, UnauthorizedException } from '../response/error.response'
 import { UserRepository } from '../../DB/repository/user.reository'
 import { TokenRepository } from '../../DB/repository/token.repository'
-import { TokenModel } from '../../DB/model/Token.model'
+import { HTokenDocument, TokenModel } from '../../DB/model/Token.model'
 export enum SignatureLevelEnum {
     Bearer="Bearer",
     System="System"
@@ -61,7 +61,7 @@ export const getSignature=async(signatureLevel:SignatureLevelEnum=SignatureLevel
 switch(signatureLevel){
     case SignatureLevelEnum.System:
         signature.access_signature=process.env.ACCESS_SYSYEM_TOKEN_SIGNATURE as string;
-        signature.refresh_signature=process.env.REFRESH_SYSYEM_TOKEN_SIGNATURE as string;
+        signature.refresh_signature=process.env.REFRESH_USER_TOKEN_SIGNATURE as string;
         break;
         default:
       signature.access_signature=process.env.ACCESS_USER_TOKEN_SIGNATURE as string;
@@ -78,7 +78,7 @@ export const createLoginCredentaails=async(user:HUserDocument)=>{
   const access_token=await generarteToken({
                 payload: {_id:user._id},
                 secret:signatures.access_signature,
-                 options:{expiresIn:Number(process.env.Access_TOKEN_EXPIRES_IN),jwtid}
+                 options:{expiresIn:Number(process.env.ACCESS_TOKEN_EXPIRES_IN),jwtid}
             });
              const refresh_token=await generarteToken({
                 payload:{_id:user._id},
@@ -124,4 +124,20 @@ if(user.changeCredentialTime?.getTime()||0>decoded.iat*1000){
     throw new UnauthorizedException("invalid or old login credentials")
 }
 return {user ,decoded}
+}
+
+export const createRevokeToken=async(decoded:JwtPayload):Promise<HTokenDocument>=>{
+    const  tokenModel=new TokenRepository(TokenModel)
+   const [result]=  await tokenModel.create({
+                    data:[{
+                        jti:decoded?.jti as string,
+                        expiresIn:decoded?.iat as number+Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+                        userId:decoded?._id,
+                    }]
+                })||[]
+                if(!result){
+                    throw new BadReauest("fail to revoke this token")
+                }
+                return result
+
 }

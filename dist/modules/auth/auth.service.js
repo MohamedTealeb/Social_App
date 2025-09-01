@@ -8,9 +8,22 @@ const hash_security_1 = require("../../utils/security/hash.security");
 const email_event_1 = require("../../utils/event/email.event");
 const otp_1 = require("../../utils/otp");
 const token_security_1 = require("../../utils/security/token.security");
+const google_auth_library_1 = require("google-auth-library");
 class AuthenticationService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
     constructor() { }
+    async verifyGmailAccount(idToken) {
+        const client = new google_auth_library_1.OAuth2Client();
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.WEB_CLIENT_IDS?.split(",") || []
+        });
+        const payload = ticket.getPayload();
+        if (!payload?.email_verified) {
+            throw new error_response_1.BadReauest("fail to verify google acc");
+        }
+        return payload;
+    }
     /**
      *
      *  @param req Exress.Request
@@ -89,6 +102,37 @@ class AuthenticationService {
         return res.status(200).json({
             message: "Done",
             data: req.body
+        });
+    };
+    signupWithGmail = async (req, res) => {
+        const { idToken } = req.body;
+        const { email, family_name, given_name, picture } = await this.verifyGmailAccount(idToken);
+        const user = await this.userModel.findOne({
+            filter: {
+                email,
+            }
+        });
+        if (user) {
+            if (user.provider === User_model_1.providerEnm.GOOGLE) {
+                // return loginWithGmail()
+            }
+            throw new error_response_1.ConflictException(`Email exist with another provider ${user.provider}`);
+        }
+        const [newUser] = await this.userModel.create({
+            data: [{ firstName: given_name,
+                    lastName: family_name,
+                    profileImage: picture,
+                    confirmAt: new Date() }]
+        }) || [];
+        if (!newUser) {
+            throw new error_response_1.BadReauest("Fail to signup with gmail please try again later");
+        }
+        const credentials = await (0, token_security_1.createLoginCredentaails)(newUser);
+        return res.status(201).json({
+            message: "Done",
+            data: {
+                credentials
+            }
         });
     };
 }

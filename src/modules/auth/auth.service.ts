@@ -1,17 +1,30 @@
 import type { Request,Response } from 'express';
-import { IConfirmEmail, ILoginBody, ISignupBody } from './dto/auth.dto';
+import { IConfirmEmail, IGmail, ILoginBody, ISignupBody } from './dto/auth.dto';
 // import {  BadReauest } from '../../utils/response/error.response';
-import {  UserModel } from '../../DB/model/User.model';
+import {  providerEnm, UserModel } from '../../DB/model/User.model';
 import { BadReauest, ConflictException, Notfound } from '../../utils/response/error.response';
 import { UserRepository } from '../../DB/repository/user.reository';
 import { CompareHash, generateHash } from '../../utils/security/hash.security';
 import { emailEvent } from '../../utils/event/email.event';
 import { generateNumberOtp } from '../../utils/otp';
 import { createLoginCredentaails } from '../../utils/security/token.security';
+  import {OAuth2Client,type TokenPayload}from 'google-auth-library';
 class AuthenticationService{
     private  userModel =new UserRepository(UserModel)
     constructor(){}
-
+ 
+    private async verifyGmailAccount(idToken:string):Promise<TokenPayload>{
+        const client=new OAuth2Client();
+        const ticket=await client.verifyIdToken({
+            idToken,
+            audience:process.env.WEB_CLIENT_IDS?.split(",")||[]
+        })
+        const payload=ticket.getPayload()
+        if(!payload?.email_verified){
+            throw new BadReauest("fail to verify google acc")
+        }
+        return payload
+    }
     /**
      * 
      *  @param req Exress.Request
@@ -98,6 +111,39 @@ const credentials=await createLoginCredentaails(user)
             return res.status(200).json({
                 message:"Done",
                 data:req.body
+            })
+        }
+        signupWithGmail=async(req:Request,res:Response):Promise<Response>=>{
+            const {idToken}:IGmail=req.body;
+            const{email,family_name,given_name,picture}:TokenPayload=await this.verifyGmailAccount(idToken)
+            const user=await this.userModel.findOne({
+                filter:{
+                    email,
+                }
+            })
+            if(user){
+                if(user.provider===providerEnm.GOOGLE){
+                    // return loginWithGmail()
+                }
+                throw new ConflictException(`Email exist with another provider ${user.provider}`)
+            }
+            const [newUser]=await this.userModel.create({
+                data:[{firstName:given_name as string,
+                    lastName:family_name as string,
+                    profileImage:picture as string,
+                    confirmAt:new Date()
+                
+                }]
+            })||[]
+            if(!newUser){
+                throw new BadReauest("Fail to signup with gmail please try again later")
+            } 
+            const credentials=await createLoginCredentaails(newUser)
+            return res.status(201).json({
+                message:"Done",
+                data:{
+                    credentials
+                }
             })
         }
         

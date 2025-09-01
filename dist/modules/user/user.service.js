@@ -27,13 +27,7 @@ class UserService {
                 update.changeCredentialTime = new Date();
                 break;
             default:
-                await this.tokenModel.create({
-                    data: [{
-                            jti: req.decoded?.jti,
-                            expiresIn: req.decoded?.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
-                            userId: req.decoded?._id,
-                        }]
-                });
+                await (0, token_security_1.createRevokeToken)(req.decoded);
                 statusCode = 201;
                 break;
         }
@@ -46,6 +40,16 @@ class UserService {
             date: {
                 user: req.user,
                 decoded: req.decoded
+            }
+        });
+    };
+    refreshToken = async (req, res) => {
+        const credentials = await (0, token_security_1.createLoginCredentaails)(req.user);
+        await (0, token_security_1.createRevokeToken)(req.decoded);
+        return res.status(201).json({
+            message: "Donne",
+            data: {
+                credentials
             }
         });
     };

@@ -1,5 +1,6 @@
 import type { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 import { HUserDocument, RoleEnum } from '../../DB/model/User.model';
+import { HTokenDocument } from '../../DB/model/Token.model';
 export declare enum SignatureLevelEnum {
     Bearer = "Bearer",
     System = "System"
@@ -41,4 +42,5 @@ export declare const decodeToken: ({ authorization, tokenType }: {
     };
     decoded: JwtPayload;
 }>;
+export declare const createRevokeToken: (decoded: JwtPayload) => Promise<HTokenDocument>;
 //# sourceMappingURL=token.security.d.ts.map

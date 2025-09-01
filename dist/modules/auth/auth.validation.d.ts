@@ -23,4 +23,9 @@ export declare const confirmEmail: {
         otp: z.ZodString;
     }, z.core.$strict>;
 };
+export declare const signupWithGmail: {
+    body: z.ZodObject<{
+        idToken: z.ZodString;
+    }, z.core.$strict>;
+};
 //# sourceMappingURL=auth.validation.d.ts.map

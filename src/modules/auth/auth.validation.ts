@@ -37,3 +37,9 @@ export const confirmEmail={
 })
 }
 
+export const signupWithGmail={
+    body:z.strictObject({
+        idToken:z.string()
+    })
+
+}

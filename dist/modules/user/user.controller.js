@@ -38,13 +38,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const user_service_1 = __importDefault(require("./user.service"));
-const authentication_middlewar_1 = require("../../middleware/authentication.middlewar");
-const user_authorization_1 = require("./user.authorization");
-const authentication_middlewar_2 = require("./../../middleware/authentication.middlewar");
+const authentication_middlewar_1 = require("./../../middleware/authentication.middlewar");
 const validator = __importStar(require("./user.validation"));
 const validation_middleware_1 = require("../../middleware/validation.middleware");
+const token_security_1 = require("../../utils/security/token.security");
 const router = (0, express_1.Router)();
-router.get("/", (0, authentication_middlewar_1.authorization)(user_authorization_1.endpoint.profile), user_service_1.default.profile);
-router.post("/logout", (0, authentication_middlewar_2.authentication)(), (0, validation_middleware_1.validation)(validator.logout), user_service_1.default.logout);
+router.get("/", (0, authentication_middlewar_1.authentication)(), user_service_1.default.profile);
+router.post("/refresh-token", (0, authentication_middlewar_1.authentication)(token_security_1.TokenEnum.refresh), user_service_1.default.refreshToken);
+router.post("/logout", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.logout), user_service_1.default.logout);
 exports.default = router;
 //# sourceMappingURL=user.controller.js.map

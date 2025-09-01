@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 declare class AuthenticationService {
     private userModel;
     constructor();
+    private verifyGmailAccount;
     /**
      *
      *  @param req Exress.Request
@@ -13,6 +14,7 @@ declare class AuthenticationService {
     signup: (req: Request, res: Response) => Promise<Response>;
     login: (req: Request, res: Response) => Promise<Response>;
     confirmEmail: (req: Request, res: Response) => Promise<Response>;
+    signupWithGmail: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: AuthenticationService;
 export default _default;

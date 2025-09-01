@@ -2,11 +2,12 @@ import {  Request, Response } from "express";
 import { ILpogoutDto } from "./user.dto";
 
 import { UpdateQuery } from "mongoose";
-import { IUser, UserModel } from "../../DB/model/User.model";
+import { HUserDocument, IUser, UserModel } from "../../DB/model/User.model";
 import { UserRepository } from "../../DB/repository/user.reository";
 import { TokenRepository } from "../../DB/repository/token.repository";
 import { TokenModel } from "../../DB/model/Token.model";
-import { LogoutEnum } from '../../utils/security/token.security';
+import { createLoginCredentaails, createRevokeToken, LogoutEnum } from '../../utils/security/token.security';
+import { JwtPayload } from "jsonwebtoken";
 
  
 
@@ -38,13 +39,7 @@ import { LogoutEnum } from '../../utils/security/token.security';
             update.changeCredentialTime=new Date();
             break;
             default:
-                await this.tokenModel.create({
-                    data:[{
-                        jti:req.decoded?.jti as string,
-                        expiresIn:req.decoded?.iat as number+Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
-                        userId:req.decoded?._id,
-                    }]
-                })
+         await createRevokeToken(req.decoded as JwtPayload)
                 statusCode=201
                 break
            }
@@ -57,6 +52,17 @@ import { LogoutEnum } from '../../utils/security/token.security';
             date:{
                 user:req.user,
                 decoded:req.decoded
+            }
+        })
+    }
+
+    refreshToken=async(req:Request,res:Response):Promise<Response>=>{
+        const credentials=await createLoginCredentaails(req.user as HUserDocument)
+            await createRevokeToken(req.decoded as JwtPayload)
+        return res.status(201).json({
+            message:"Donne",
+            data:{
+                credentials
             }
         })
     }

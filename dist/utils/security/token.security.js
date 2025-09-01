@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeToken = exports.createLoginCredentaails = exports.getSignature = exports.detectSignatureLevel = exports.verifyrteToken = exports.generarteToken = exports.LogoutEnum = exports.TokenEnum = exports.SignatureLevelEnum = void 0;
+exports.createRevokeToken = exports.decodeToken = exports.createLoginCredentaails = exports.getSignature = exports.detectSignatureLevel = exports.verifyrteToken = exports.generarteToken = exports.LogoutEnum = exports.TokenEnum = exports.SignatureLevelEnum = void 0;
 const uuid_1 = require("uuid");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const User_model_1 = require("../../DB/model/User.model");
@@ -52,7 +52,7 @@ const getSignature = async (signatureLevel = SignatureLevelEnum.Bearer) => {
     switch (signatureLevel) {
         case SignatureLevelEnum.System:
             signature.access_signature = process.env.ACCESS_SYSYEM_TOKEN_SIGNATURE;
-            signature.refresh_signature = process.env.REFRESH_SYSYEM_TOKEN_SIGNATURE;
+            signature.refresh_signature = process.env.REFRESH_USER_TOKEN_SIGNATURE;
             break;
         default:
             signature.access_signature = process.env.ACCESS_USER_TOKEN_SIGNATURE;
@@ -69,7 +69,7 @@ const createLoginCredentaails = async (user) => {
     const access_token = await (0, exports.generarteToken)({
         payload: { _id: user._id },
         secret: signatures.access_signature,
-        options: { expiresIn: Number(process.env.Access_TOKEN_EXPIRES_IN), jwtid }
+        options: { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN), jwtid }
     });
     const refresh_token = await (0, exports.generarteToken)({
         payload: { _id: user._id },
@@ -113,4 +113,19 @@ const decodeToken = async ({ authorization, tokenType = TokenEnum.access }) => {
     return { user, decoded };
 };
 exports.decodeToken = decodeToken;
+const createRevokeToken = async (decoded) => {
+    const tokenModel = new token_repository_1.TokenRepository(Token_model_1.TokenModel);
+    const [result] = await tokenModel.create({
+        data: [{
+                jti: decoded?.jti,
+                expiresIn: decoded?.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+                userId: decoded?._id,
+            }]
+    }) || [];
+    if (!result) {
+        throw new error_response_1.BadReauest("fail to revoke this token");
+    }
+    return result;
+};
+exports.createRevokeToken = createRevokeToken;
 //# sourceMappingURL=token.security.js.map
