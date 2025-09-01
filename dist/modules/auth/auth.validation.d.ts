@@ -28,4 +28,23 @@ export declare const signupWithGmail: {
         idToken: z.ZodString;
     }, z.core.$strict>;
 };
+export declare const sendForgotPasseordCode: {
+    body: z.ZodObject<{
+        email: z.ZodEmail;
+    }, z.core.$strict>;
+};
+export declare const verifyForgotPasseordCode: {
+    body: z.ZodObject<{
+        email: z.ZodEmail;
+        otp: z.ZodString;
+    }, z.core.$strict>;
+};
+export declare const restForgotPasseordCode: {
+    body: z.ZodObject<{
+        email: z.ZodEmail;
+        otp: z.ZodString;
+        password: z.ZodString;
+        confirmPassword: z.ZodString;
+    }, z.core.$strict>;
+};
 //# sourceMappingURL=auth.validation.d.ts.map

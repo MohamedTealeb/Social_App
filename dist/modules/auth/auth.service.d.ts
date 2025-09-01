@@ -16,6 +16,9 @@ declare class AuthenticationService {
     confirmEmail: (req: Request, res: Response) => Promise<Response>;
     signupWithGmail: (req: Request, res: Response) => Promise<Response>;
     LoginWithGmail: (req: Request, res: Response) => Promise<Response>;
+    sendForgotCode: (req: Request, res: Response) => Promise<Response>;
+    verifyForgotPasseordCode: (req: Request, res: Response) => Promise<Response>;
+    resetForgotPasseordCode: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: AuthenticationService;
 export default _default;

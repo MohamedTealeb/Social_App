@@ -157,6 +157,73 @@ class AuthenticationService {
             }
         });
     };
+    sendForgotCode = async (req, res) => {
+        const { email } = req.body;
+        const user = await this.userModel.findOne({
+            filter: { email, provider: User_model_1.providerEnm.SYSTEM, confirmAt: { $exists: true } }
+        });
+        if (!user) {
+            throw new error_response_1.Notfound("invalid account due to one of the following reasons [not registerd , invalid provider ,not confirmed]");
+        }
+        const otp = (0, otp_1.generateNumberOtp)();
+        const result = await this.userModel.updateOne({
+            filter: { email },
+            update: {
+                resetPasswordOtp: await (0, hash_security_1.generateHash)(String(otp))
+            }
+        });
+        if (!result.matchedCount) {
+            throw new error_response_1.BadReauest("fail to send the reset code please try again later");
+        }
+        email_event_1.emailEvent.emit("resetPassword", {
+            to: email,
+            otp
+        });
+        return res.status(200).json({
+            message: "Done",
+        });
+    };
+    verifyForgotPasseordCode = async (req, res) => {
+        const { email, otp } = req.body;
+        const user = await this.userModel.findOne({
+            filter: { email, provider: User_model_1.providerEnm.SYSTEM, resetPasswordOtp: { $exists: true } }
+        });
+        if (!user) {
+            throw new error_response_1.Notfound("invalid account due to one of the following reasons [not registerd , invalid provider ,not confirmed,missing resetpasswordotp]");
+        }
+        if (!(await (0, hash_security_1.CompareHash)(otp, user.resetPasswordOtp))) {
+            throw new error_response_1.ConflictException("invalid otp");
+        }
+        return res.status(200).json({
+            message: "Done",
+        });
+    };
+    resetForgotPasseordCode = async (req, res) => {
+        const { email, otp, password } = req.body;
+        const user = await this.userModel.findOne({
+            filter: { email, provider: User_model_1.providerEnm.SYSTEM, resetPasswordOtp: { $exists: true } }
+        });
+        if (!user) {
+            throw new error_response_1.Notfound("invalid account due to one of the following reasons [not registerd , invalid provider ,not confirmed,missing resetpasswordotp]");
+        }
+        if (!(await (0, hash_security_1.CompareHash)(otp, user.resetPasswordOtp))) {
+            throw new error_response_1.ConflictException("invalid otp");
+        }
+        const result = await this.userModel.updateOne({
+            filter: { email },
+            update: {
+                password: await (0, hash_security_1.generateHash)(password),
+                $unset: { resetPasswordOtp: 1 },
+                changeCredentialTime: new Date()
+            }
+        });
+        if (!result.matchedCount) {
+            throw new error_response_1.BadReauest("fail to reset the acc password");
+        }
+        return res.status(200).json({
+            message: "Done",
+        });
+    };
 }
 exports.default = new AuthenticationService();
 //# sourceMappingURL=auth.service.js.map

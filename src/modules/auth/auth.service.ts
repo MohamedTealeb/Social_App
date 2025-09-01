@@ -1,5 +1,5 @@
 import type { Request,Response } from 'express';
-import { IConfirmEmail, IGmail, ILoginBody, ISignupBody } from './dto/auth.dto';
+import { IConfirmEmail, IForgotCode, IGmail, ILoginBody, IRestyCode, ISignupBody, IVerifyCode } from './dto/auth.dto';
 // import {  BadReauest } from '../../utils/response/error.response';
 import {  providerEnm, UserModel } from '../../DB/model/User.model';
 import { BadReauest, ConflictException, Notfound } from '../../utils/response/error.response';
@@ -170,6 +170,100 @@ const credentials=await createLoginCredentaails(user)
                     credentials
                 }
             })
+        }
+        sendForgotCode=async(req:Request,res:Response):Promise<Response>=>{
+
+ const{email}:IForgotCode=req.body
+            const user=await this.userModel.findOne({
+                filter:{email,provider:providerEnm.SYSTEM,confirmAt:{$exists:true}}
+            })
+            if(!user){
+                throw new Notfound("invalid account due to one of the following reasons [not registerd , invalid provider ,not confirmed]")
+            }
+          
+         
+
+const otp=generateNumberOtp(); 
+      const result=   await this.userModel.updateOne({
+    filter:{email},
+    update:{
+        resetPasswordOtp:await generateHash(String(otp))
+    }
+})
+if(!result.matchedCount){
+    throw new BadReauest("fail to send the reset code please try again later")
+}
+emailEvent.emit("resetPassword",{
+    to:email,
+    otp
+})
+            return res.status(200).json({
+                message:"Done",
+               
+            })
+
+
+        }
+        verifyForgotPasseordCode=async(req:Request,res:Response):Promise<Response>=>{
+
+ const{email,otp}:IVerifyCode=req.body
+            const user=await this.userModel.findOne({
+                filter:{email,provider:providerEnm.SYSTEM,resetPasswordOtp:{$exists:true}}
+            })
+            if(!user){
+                throw new Notfound("invalid account due to one of the following reasons [not registerd , invalid provider ,not confirmed,missing resetpasswordotp]")
+            }
+            if(!(await CompareHash(otp,user.resetPasswordOtp as string))){
+                throw new ConflictException("invalid otp")
+            }
+          
+         
+
+
+
+
+            return res.status(200).json({
+                message:"Done",
+               
+            })
+
+
+        }
+        resetForgotPasseordCode=async(req:Request,res:Response):Promise<Response>=>{
+
+ const{email,otp,password}:IRestyCode=req.body
+            const user=await this.userModel.findOne({
+                filter:{email,provider:providerEnm.SYSTEM,resetPasswordOtp:{$exists:true}}
+            })
+            if(!user){
+                throw new Notfound("invalid account due to one of the following reasons [not registerd , invalid provider ,not confirmed,missing resetpasswordotp]")
+            }
+            if(!(await CompareHash(otp,user.resetPasswordOtp as string))){
+                throw new ConflictException("invalid otp")
+            }
+          
+                const result=   await this.userModel.updateOne({
+    filter:{email},
+    update:{
+        password:await generateHash(password),
+     $unset:{ resetPasswordOtp:1},
+     changeCredentialTime:new Date()
+    }
+})
+if(!result.matchedCount){
+    throw new BadReauest("fail to reset the acc password")
+}
+         
+
+
+
+
+            return res.status(200).json({
+                message:"Done",
+               
+            })
+
+
         }
         
     }

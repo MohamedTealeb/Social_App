@@ -10,5 +10,8 @@ router.post("/signup-gmail",validation(validators.signupWithGmail),authService.s
 router.post("/login-gmail",validation(validators.signupWithGmail),authService.LoginWithGmail)
 
 router.post("/login",validation(validators.login),authService.login)
+router.patch("/send-reset-password",validation(validators.sendForgotPasseordCode),authService.sendForgotCode)
+router.patch("/verify-reset-password",validation(validators.verifyForgotPasseordCode),authService.verifyForgotPasseordCode)
+router.patch("/reset-password",validation(validators.restForgotPasseordCode),authService.resetForgotPasseordCode)
 router.patch("/confirm-email",validation(validators.confirmEmail),authService.confirmEmail)
 export default router;
