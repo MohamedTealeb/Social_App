@@ -62,7 +62,7 @@ class AuthenticationService {
     login = async (req, res) => {
         const { email, password } = req.body;
         const user = await this.userModel.findOne({
-            filter: { email }
+            filter: { email, provider: User_model_1.providerEnm.SYSTEM }
         });
         if (!user) {
             throw new error_response_1.Notfound("invalid login data");
@@ -114,21 +114,43 @@ class AuthenticationService {
         });
         if (user) {
             if (user.provider === User_model_1.providerEnm.GOOGLE) {
-                // return loginWithGmail()
+                return await this.LoginWithGmail(req, res);
             }
             throw new error_response_1.ConflictException(`Email exist with another provider ${user.provider}`);
         }
         const [newUser] = await this.userModel.create({
             data: [{ firstName: given_name,
                     lastName: family_name,
+                    email: email,
                     profileImage: picture,
-                    confirmAt: new Date() }]
+                    confirmAt: new Date(),
+                    provider: User_model_1.providerEnm.GOOGLE }]
         }) || [];
         if (!newUser) {
             throw new error_response_1.BadReauest("Fail to signup with gmail please try again later");
         }
         const credentials = await (0, token_security_1.createLoginCredentaails)(newUser);
         return res.status(201).json({
+            message: "Done",
+            data: {
+                credentials
+            }
+        });
+    };
+    LoginWithGmail = async (req, res) => {
+        const { idToken } = req.body;
+        const { email } = await this.verifyGmailAccount(idToken);
+        const user = await this.userModel.findOne({
+            filter: {
+                email,
+                provider: User_model_1.providerEnm.GOOGLE
+            }
+        });
+        if (!user) {
+            throw new error_response_1.Notfound(`not register account or registerd with another provider`);
+        }
+        const credentials = await (0, token_security_1.createLoginCredentaails)(user);
+        return res.status(200).json({
             message: "Done",
             data: {
                 credentials

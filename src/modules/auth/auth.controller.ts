@@ -7,6 +7,7 @@ const router:Router=Router();
 
 router.post("/signup",validation(validators.signup),authService.signup)
 router.post("/signup-gmail",validation(validators.signupWithGmail),authService.signupWithGmail)
+router.post("/login-gmail",validation(validators.signupWithGmail),authService.LoginWithGmail)
 
 router.post("/login",validation(validators.login),authService.login)
 router.patch("/confirm-email",validation(validators.confirmEmail),authService.confirmEmail)
