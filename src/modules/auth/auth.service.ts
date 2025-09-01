@@ -7,7 +7,7 @@ import { UserRepository } from '../../DB/repository/user.reository';
 import { CompareHash, generateHash } from '../../utils/security/hash.security';
 import { emailEvent } from '../../utils/event/email.event';
 import { generateNumberOtp } from '../../utils/otp';
-import { generarteToken } from '../../utils/security/token.security';
+import { createLoginCredentaails } from '../../utils/security/token.security';
 class AuthenticationService{
     private  userModel =new UserRepository(UserModel)
     constructor(){}
@@ -67,21 +67,10 @@ class AuthenticationService{
                 throw new Notfound("invalid login data")
             }
 
-             const access_token=await generarteToken({
-                payload: {_id:user._id},
-            });
-             const refresh_token=await generarteToken({
-                payload:{_id:user._id},
-                secret:process.env.REFRESH_USER_TOKEN_SIGNATURE as string,
-                options:{expiresIn:Number(process.env.REFRESH_TOKEN_EXPIRES_IN)}
-             })
-
-
+const credentials=await createLoginCredentaails(user)
             return res.status(200).json({
                 message:"Done",
-                data:{Credentials:{
-                    access_token,refresh_token
-                }}
+                data:{credentials}
             })
         }
         confirmEmail=async(req:Request,res:Response):Promise<Response>=>{

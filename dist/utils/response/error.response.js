@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.globalErrorHandling = exports.ConflictException = exports.Notfound = exports.BadReauest = exports.AppError = void 0;
+exports.ForbiddenException = exports.UnauthorizedException = exports.globalErrorHandling = exports.ConflictException = exports.Notfound = exports.BadReauest = exports.AppError = void 0;
 class AppError extends Error {
     message;
     statusCode;
@@ -41,4 +41,16 @@ const globalErrorHandling = (error, req, res, next) => {
     });
 };
 exports.globalErrorHandling = globalErrorHandling;
+class UnauthorizedException extends AppError {
+    constructor(message, cause) {
+        super(message, 401, cause);
+    }
+}
+exports.UnauthorizedException = UnauthorizedException;
+class ForbiddenException extends AppError {
+    constructor(message, cause) {
+        super(message, 403, cause);
+    }
+}
+exports.ForbiddenException = ForbiddenException;
 //# sourceMappingURL=error.response.js.map

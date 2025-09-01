@@ -18,5 +18,11 @@ export declare class ConflictException extends AppError {
     constructor(message: string, cause?: unknown);
 }
 export declare const globalErrorHandling: (error: IError, req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
+export declare class UnauthorizedException extends AppError {
+    constructor(message: string, cause?: unknown);
+}
+export declare class ForbiddenException extends AppError {
+    constructor(message: string, cause?: unknown);
+}
 export {};
 //# sourceMappingURL=error.response.d.ts.map

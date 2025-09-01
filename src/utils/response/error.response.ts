@@ -39,3 +39,13 @@ export const globalErrorHandling = (error:IError,req:Request,res:Response,next:N
       cause:error.cause,
    })
 }
+export class UnauthorizedException extends AppError{
+    constructor(message:string,cause?:unknown){
+        super(message,401,cause)
+    }
+}
+export class ForbiddenException extends AppError{
+    constructor(message:string,cause?:unknown){
+        super(message,403,cause)
+    }
+}

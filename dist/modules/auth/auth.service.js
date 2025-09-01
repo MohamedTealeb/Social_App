@@ -60,19 +60,10 @@ class AuthenticationService {
         if (!(await (0, hash_security_1.CompareHash)(password, user.password))) {
             throw new error_response_1.Notfound("invalid login data");
         }
-        const access_token = await (0, token_security_1.generarteToken)({
-            payload: { _id: user._id },
-        });
-        const refresh_token = await (0, token_security_1.generarteToken)({
-            payload: { _id: user._id },
-            secret: process.env.REFRESH_USER_TOKEN_SIGNATURE,
-            options: { expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN) }
-        });
+        const credentials = await (0, token_security_1.createLoginCredentaails)(user);
         return res.status(200).json({
             message: "Done",
-            data: { Credentials: {
-                    access_token, refresh_token
-                } }
+            data: { credentials }
         });
     };
     confirmEmail = async (req, res) => {

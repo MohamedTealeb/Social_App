@@ -5,6 +5,7 @@ import type { Express,NextFunction,Request,Response } from 'express';
 import  express from 'express';
 import cors from 'cors'
 import authController from'./modules/auth/auth.controller';
+import userController from './modules/user/user.controller'
 import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
 import { globalErrorHandling } from './utils/response/error.response';
@@ -34,6 +35,7 @@ app.get('/',(req:Request,res:Response,next:NextFunction)=>{
    })
 })
 app.use("/auth",authController)
+app.use("/user",userController)
 app.use('{/*dummy}',(req:Request,res:Response,next:NextFunction)=>{
    return res.status(404).json({
       error:"Not Found",

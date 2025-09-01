@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Types, HydratedDocument } from "mongoose";
 export declare enum GenderEnum {
     male = "male",
     female = "female"
@@ -30,4 +30,5 @@ export declare const UserModel: import("mongoose").Model<any, {}, {}, {}, any, a
 }> & {
     __v: number;
 }, any>;
+export type HUserDocument = HydratedDocument<IUser>;
 //# sourceMappingURL=User.model.d.ts.map

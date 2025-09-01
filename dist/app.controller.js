@@ -9,6 +9,7 @@ const dotenv_1 = require("dotenv");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const auth_controller_1 = __importDefault(require("./modules/auth/auth.controller"));
+const user_controller_1 = __importDefault(require("./modules/user/user.controller"));
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
@@ -33,6 +34,7 @@ const bootstrap = async () => {
         });
     });
     app.use("/auth", auth_controller_1.default);
+    app.use("/user", user_controller_1.default);
     app.use('{/*dummy}', (req, res, next) => {
         return res.status(404).json({
             error: "Not Found",
