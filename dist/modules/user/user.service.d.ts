@@ -4,6 +4,7 @@ declare class UserService {
     private tokenModel;
     constructor();
     profile: (req: Request, res: Response) => Promise<Response>;
+    profileImage: (req: Request, res: Response) => Promise<Response>;
     logout: (req: Request, res: Response) => Promise<Response>;
     refreshToken: (req: Request, res: Response) => Promise<Response>;
 }

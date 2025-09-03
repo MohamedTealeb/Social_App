@@ -29,6 +29,16 @@ import { JwtPayload } from "jsonwebtoken";
             }
         })
     }
+    profileImage=async(req:Request,res:Response):Promise<Response>=>{
+           
+
+        return res.json({
+            message:"Done",
+            date:{
+             file:req.file
+            }
+        })
+    }
     logout=async(req:Request,res:Response):Promise<Response>=>{
            const {flag}:ILpogoutDto=req.body
            let statusCode:number=200
