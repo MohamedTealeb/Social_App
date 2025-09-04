@@ -5,6 +5,7 @@ const user_reository_1 = require("../../DB/repository/user.reository");
 const token_repository_1 = require("../../DB/repository/token.repository");
 const Token_model_1 = require("../../DB/model/Token.model");
 const token_security_1 = require("../../utils/security/token.security");
+// import { uploadFile } from "multer/s3.config";
 class UserService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
     tokenModel = new token_repository_1.TokenRepository(Token_model_1.TokenModel);
@@ -19,6 +20,10 @@ class UserService {
         });
     };
     profileImage = async (req, res) => {
+        // const key=await uploadFile({
+        //     file:req.file as Express.Multer.File,
+        //     path:`users/${req.decoded?._id}`
+        // })
         return res.json({
             message: "Done",
             date: {

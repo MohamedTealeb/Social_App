@@ -8,6 +8,7 @@ import { TokenRepository } from "../../DB/repository/token.repository";
 import { TokenModel } from "../../DB/model/Token.model";
 import { createLoginCredentaails, createRevokeToken, LogoutEnum } from '../../utils/security/token.security';
 import { JwtPayload } from "jsonwebtoken";
+// import { uploadFile } from "multer/s3.config";
 
  
 
@@ -31,7 +32,10 @@ import { JwtPayload } from "jsonwebtoken";
     }
     profileImage=async(req:Request,res:Response):Promise<Response>=>{
            
-
+            // const key=await uploadFile({
+            //     file:req.file as Express.Multer.File,
+            //     path:`users/${req.decoded?._id}`
+            // })
         return res.json({
             message:"Done",
             date:{
