@@ -42,8 +42,16 @@ app.use('{/*dummy}',(req:Request,res:Response,next:NextFunction)=>{
       message:"The requested resource was not found on this server."
    })
 })
-await connectDB()
+
 app.use(globalErrorHandling)
+
+await connectDB()
+
+//hoooks
+async function test() {
+   
+   
+}
 app.listen(port,()=>{
 console.log(`Server is running on port ${port} `);})
 }

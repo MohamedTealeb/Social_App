@@ -71,5 +71,8 @@ userSchema.virtual("username").set(function(value:string){
 }).get(function(){
     return this.firstName + " " + this.lastName
 })
+userSchema.pre("save",function(next){
+    return
+})
 export const UserModel=models.User||model<IUser>("User",userSchema)
 export type HUserDocument=HydratedDocument<IUser>
