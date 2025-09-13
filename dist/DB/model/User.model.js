@@ -20,6 +20,7 @@ var providerEnm;
 const userSchema = new mongoose_1.Schema({
     firstName: { type: String, required: true, minLength: 2, maxLength: 25 },
     lastName: { type: String, required: true, minLength: 2, maxLength: 25 },
+    slug: { type: String, required: true, minLength: 2, maxLength: 51 },
     email: { type: String, required: true, unique: true },
     confrimEmailOtp: { type: String },
     confirmAt: { type: Date },
@@ -40,11 +41,18 @@ const userSchema = new mongoose_1.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
-userSchema.virtual("username").set(function (value) {
-    const [firstName, LastName] = value.split(" ") || [];
-    this.set({ firstName, LastName });
-}).get(function () {
-    return this.firstName + " " + this.lastName;
+userSchema.virtual("username")
+    .set(function (value) {
+    const [firstName = "", lastName = ""] = value.split(" ");
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.slug = value.trim().replace(/\s+/g, "-").toLowerCase();
+})
+    .get(function () {
+    return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
+});
+userSchema.pre("save", function (next) {
+    return;
 });
 exports.UserModel = mongoose_1.models.User || (0, mongoose_1.model)("User", userSchema);
 //# sourceMappingURL=User.model.js.map

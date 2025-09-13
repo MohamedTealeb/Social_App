@@ -18,6 +18,7 @@ export interface IUser{
     _id:Types.ObjectId;
     firstName: string;
     lastName:string;
+    slug:string;
     username?:string;
     email:string;
     confrimEmailOtp?:string;
@@ -41,6 +42,7 @@ const userSchema=new Schema<IUser>({
 
     firstName:{type:String,required:true,minLength:2,maxLength:25}, 
     lastName:{type:String,required:true,minLength:2,maxLength:25},
+    slug:{type:String,required:true,minLength:2,maxLength:51},
    
     email:{type:String,required:true,unique:true},
     confrimEmailOtp:{type:String},
@@ -65,12 +67,16 @@ const userSchema=new Schema<IUser>({
     toObject:{virtuals:true}
 })
 
-userSchema.virtual("username").set(function(value:string){
- const [firstName,LastName]=value.split(" ")||[];
- this.set({firstName,LastName})
-}).get(function(){
-    return this.firstName + " " + this.lastName
-})
+userSchema.virtual("username")
+  .set(function (value: string) {
+    const [firstName = "", lastName = ""] = value.split(" ");
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.slug = value.trim().replace(/\s+/g, "-").toLowerCase();
+  })
+  .get(function () {
+    return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
+  });
 userSchema.pre("save",function(next){
     return
 })

@@ -41,8 +41,11 @@ const bootstrap = async () => {
             message: "The requested resource was not found on this server."
         });
     });
-    await (0, connections_db_1.default)();
     app.use(error_response_1.globalErrorHandling);
+    await (0, connections_db_1.default)();
+    //hoooks
+    async function test() {
+    }
     app.listen(port, () => {
         console.log(`Server is running on port ${port} `);
     });
