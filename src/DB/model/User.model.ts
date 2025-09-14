@@ -1,5 +1,5 @@
 
-import { Types,Schema, models, model, HydratedDocument } from "mongoose"
+import { Types,Schema, models, model, HydratedDocument, UpdateQuery } from "mongoose"
 
 
 export enum GenderEnum{
@@ -79,6 +79,12 @@ userSchema.virtual("username")
   });
 userSchema.pre("save",function(next){
     return
+})
+
+userSchema.pre("updateOne",async function (next) {
+  const query =this.getQuery()
+  const update=this.getUpdate()as UpdateQuery<HUserDocument>
+  
 })
 export const UserModel=models.User||model<IUser>("User",userSchema)
 export type HUserDocument=HydratedDocument<IUser>
