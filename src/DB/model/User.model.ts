@@ -82,9 +82,15 @@ userSchema.pre("save",function(next){
 })
 
 userSchema.pre("updateOne",async function (next) {
+next()
+
+})
+
+userSchema.post("updateOne",async function (next) {
   const query =this.getQuery()
   const update=this.getUpdate()as UpdateQuery<HUserDocument>
-  
+console.log({query,update})
+
 })
 export const UserModel=models.User||model<IUser>("User",userSchema)
 export type HUserDocument=HydratedDocument<IUser>
