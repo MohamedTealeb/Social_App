@@ -10,6 +10,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const auth_controller_1 = __importDefault(require("./modules/auth/auth.controller"));
 const user_controller_1 = __importDefault(require("./modules/user/user.controller"));
+const post_controller_1 = __importDefault(require("./modules/post/post.controller"));
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
@@ -35,6 +36,7 @@ const bootstrap = async () => {
     });
     app.use("/auth", auth_controller_1.default);
     app.use("/user", user_controller_1.default);
+    app.use("/user", post_controller_1.default);
     app.use('{/*dummy}', (req, res, next) => {
         return res.status(404).json({
             error: "Not Found",
@@ -44,8 +46,8 @@ const bootstrap = async () => {
     app.use(error_response_1.globalErrorHandling);
     await (0, connections_db_1.default)();
     //hoooks
-    async function test() {
-    }
+    // async function test() {
+    // }
     app.listen(port, () => {
         console.log(`Server is running on port ${port} `);
     });

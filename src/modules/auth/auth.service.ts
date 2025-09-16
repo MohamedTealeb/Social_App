@@ -47,8 +47,8 @@ class AuthenticationService{
             }
             const otp=generateNumberOtp()
             
-            const user=await this.userModel.creaeUser({
-                data:[{firstName,lastName,email,password:await generateHash(password),confrimEmailOtp:await generateHash(String(otp))}]
+            const user=await this.userModel.creaeUser({ 
+                data:[{firstName,lastName,email,password,confrimEmailOtp:`${otp}`}]
             })
 
         if(!user){

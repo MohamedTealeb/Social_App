@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModel = exports.providerEnm = exports.RoleEnum = exports.GenderEnum = void 0;
 const mongoose_1 = require("mongoose");
+const hash_security_1 = require("../../utils/security/hash.security");
+const email_event_1 = require("./../../utils/event/email.event");
 var GenderEnum;
 (function (GenderEnum) {
     GenderEnum["male"] = "male";
@@ -51,8 +53,23 @@ userSchema.virtual("username")
     .get(function () {
     return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
 });
-userSchema.pre("save", function (next) {
-    return;
+userSchema.pre("save", async function (next) {
+    this.wasNew = this.isNew;
+    if (this.isModified("password")) {
+        this.password == await (0, hash_security_1.generateHash)(this.password);
+    }
+    if (this.isModified("confrimEmailOtp")) {
+        this.confirmEmailPlainOtp = this.confrimEmailOtp;
+        this.confrimEmailOtp == await (0, hash_security_1.generateHash)(this.confrimEmailOtp);
+    }
+    next();
+});
+userSchema.post("save", async function (doc, next) {
+    const that = this;
+    if (that.wasNew && that.confirmEmailPlainOtp) {
+        email_event_1.emailEvent.emit("confirmEmail", { to: this.email, otp: that.confirmEmailPlainOtp });
+    }
+    next();
 });
 exports.UserModel = mongoose_1.models.User || (0, mongoose_1.model)("User", userSchema);
 //# sourceMappingURL=User.model.js.map

@@ -6,6 +6,7 @@ import  express from 'express';
 import cors from 'cors'
 import authController from'./modules/auth/auth.controller';
 import userController from './modules/user/user.controller'
+import postController from './modules/post/post.controller'
 import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
 import { globalErrorHandling } from './utils/response/error.response';
@@ -36,6 +37,7 @@ app.get('/',(req:Request,res:Response,next:NextFunction)=>{
 })
 app.use("/auth",authController)
 app.use("/user",userController)
+app.use("/user",postController)
 app.use('{/*dummy}',(req:Request,res:Response,next:NextFunction)=>{
    return res.status(404).json({
       error:"Not Found",
@@ -48,10 +50,10 @@ app.use(globalErrorHandling)
 await connectDB()
 
 //hoooks
-async function test() {
+// async function test() {
    
    
-}
+// }
 app.listen(port,()=>{
 console.log(`Server is running on port ${port} `);})
 }

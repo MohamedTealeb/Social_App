@@ -1,5 +1,7 @@
 
-import { Types,Schema, models, model, HydratedDocument, UpdateQuery } from "mongoose"
+import { Types,Schema, models, model, HydratedDocument } from "mongoose"
+import { generateHash } from "../../utils/security/hash.security"
+import { emailEvent } from './../../utils/event/email.event';
 
 
 export enum GenderEnum{
@@ -77,20 +79,29 @@ userSchema.virtual("username")
   .get(function () {
     return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
   });
-userSchema.pre("save",function(next){
-    return
-})
 
-userSchema.pre("updateOne",async function (next) {
-next()
+  userSchema.pre("save",async function (this:HUserDocument&{wasNew:boolean,confirmEmailPlainOtp?:string},next) 
+  {
+    this.wasNew=this.isNew
+  
+    if(this.isModified("password")){
+      this.password==await generateHash(this.password)
+    }
+    if(this.isModified("confrimEmailOtp")){
+      this.confirmEmailPlainOtp=this.confrimEmailOtp as string
+      this.confrimEmailOtp==await generateHash(this.confrimEmailOtp as string)
+    }
+    next()
+  })
 
-})
+  userSchema.post("save",async function (doc,next) {
+    const that=this as HUserDocument&{wasNew:boolean,confirmEmailPlainOtp?:string}
+    if(that.wasNew&&that.confirmEmailPlainOtp){
+  emailEvent.emit("confirmEmail",{to:this.email,otp:that.confirmEmailPlainOtp})
 
-userSchema.post("updateOne",async function (next) {
-  const query =this.getQuery()
-  const update=this.getUpdate()as UpdateQuery<HUserDocument>
-console.log({query,update})
-
-})
+}
+ next()
+    
+  })
 export const UserModel=models.User||model<IUser>("User",userSchema)
 export type HUserDocument=HydratedDocument<IUser>

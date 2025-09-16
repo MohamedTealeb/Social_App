@@ -44,7 +44,7 @@ class AuthenticationService {
         }
         const otp = (0, otp_1.generateNumberOtp)();
         const user = await this.userModel.creaeUser({
-            data: [{ firstName, lastName, email, password: await (0, hash_security_1.generateHash)(password), confrimEmailOtp: await (0, hash_security_1.generateHash)(String(otp)) }]
+            data: [{ firstName, lastName, email, password, confrimEmailOtp: `${otp}` }]
         });
         if (!user) {
             throw new error_response_1.BadReauest("fail");
