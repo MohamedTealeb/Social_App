@@ -7,6 +7,7 @@ const express_1 = require("express");
 const authentication_middlewar_1 = require("../../middleware/authentication.middlewar");
 const post_service_1 = __importDefault(require("./post.service"));
 const router = (0, express_1.Router)();
-router.post("/", (0, authentication_middlewar_1.authentication)(), post_service_1.default.createPost);
+router.post("/add", (0, authentication_middlewar_1.authentication)(), post_service_1.default.createPost);
+router.patch("/like/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.likePost);
 exports.default = router;
 //# sourceMappingURL=post.controller.js.map

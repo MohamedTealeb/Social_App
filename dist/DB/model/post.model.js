@@ -15,17 +15,15 @@ var availabilityEnum;
 })(availabilityEnum || (exports.availabilityEnum = availabilityEnum = {}));
 const postSchema = new mongoose_1.Schema({
     content: {
-        type: String, minlength: 2, maxlength: 50000, required: function () {
-            return !this.attachements?.length;
-        }
+        type: String, minlength: 2, maxlength: 50000
     },
     attachements: [String],
-    assetsFolderId: { type: String, required: true },
+    assetsFolderId: { type: String },
     availability: { type: String, enum: availabilityEnum, default: availabilityEnum.public },
     allowComments: { type: String, enum: allowCommentsEnum, default: allowCommentsEnum.allow },
     tags: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
     likes: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
-    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
+    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
     freezedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
     freezedAt: Date,
     restoredAt: Date,

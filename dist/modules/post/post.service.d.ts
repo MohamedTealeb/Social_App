@@ -4,6 +4,7 @@ declare class PostService {
     private postModel;
     constructor();
     createPost: (req: Request, res: Response) => Promise<Response>;
+    likePost: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: PostService;
 export default _default;

@@ -11,12 +11,12 @@ export declare enum availabilityEnum {
 export interface IPost {
     content?: string;
     attachements?: string[];
-    assetsFolderId: string;
-    availability: availabilityEnum;
-    allowComments: allowCommentsEnum;
+    assetsFolderId?: string;
+    availability?: availabilityEnum;
+    allowComments?: allowCommentsEnum;
     tags?: Types.ObjectId[];
     likes?: Types.ObjectId[];
-    createdBy: Types.ObjectId;
+    createdBy?: Types.ObjectId;
     freezedBy?: Types.ObjectId;
     freezedAt?: Date;
     restoredAt?: Date;

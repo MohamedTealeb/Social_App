@@ -103,5 +103,16 @@ userSchema.virtual("username")
  next()
     
   })
+  userSchema.pre(["find","findOne"],function(next){
+    const query=this.getQuery()
+
+    if(query.paranoid===false){
+      this.setQuery({...query})
+    }else{
+      this.setQuery({...query,freezedAt:{$exists:false}})
+    }
+
+    next()
+  })
 export const UserModel=models.User||model<IUser>("User",userSchema)
 export type HUserDocument=HydratedDocument<IUser>

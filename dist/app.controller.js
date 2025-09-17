@@ -36,7 +36,7 @@ const bootstrap = async () => {
     });
     app.use("/auth", auth_controller_1.default);
     app.use("/user", user_controller_1.default);
-    app.use("/user", post_controller_1.default);
+    app.use("/post", post_controller_1.default);
     app.use('{/*dummy}', (req, res, next) => {
         return res.status(404).json({
             error: "Not Found",

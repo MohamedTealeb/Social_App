@@ -37,7 +37,7 @@ app.get('/',(req:Request,res:Response,next:NextFunction)=>{
 })
 app.use("/auth",authController)
 app.use("/user",userController)
-app.use("/user",postController)
+app.use("/post",postController)
 app.use('{/*dummy}',(req:Request,res:Response,next:NextFunction)=>{
    return res.status(404).json({
       error:"Not Found",

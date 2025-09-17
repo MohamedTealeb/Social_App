@@ -12,6 +12,9 @@ const validation = (schema) => {
         for (const key of Object.keys(schema)) {
             if (!schema[key])
                 continue;
+            if (req.file) {
+                req.body.attachments = req.file;
+            }
             const validationResult = schema[key]?.safeParse(req[key]);
             if (!validationResult.success) {
                 errors.push({ key, issue: validationResult.error.issues.map(issue => {

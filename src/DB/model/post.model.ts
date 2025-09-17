@@ -15,12 +15,12 @@ onlyMe="only-me"
 export interface IPost {
     content?:string;
     attachements?:string[];
-    assetsFolderId:string
-    availability:availabilityEnum
-    allowComments:allowCommentsEnum;
+    assetsFolderId?:string
+    availability?:availabilityEnum
+    allowComments?:allowCommentsEnum;
     tags?:Types.ObjectId[]
     likes?:Types.ObjectId[]
-    createdBy:Types.ObjectId
+    createdBy?:Types.ObjectId
     freezedBy?:Types.ObjectId
     freezedAt?:Date
     restoredAt?:Date
@@ -36,20 +36,15 @@ const postSchema=new Schema<IPost>(
 
   content:
   {
-    type:String,minlength:2,maxlength:50000,required:function(){
-
-
-      return !this.attachements?.length
-  }
-
+    type:String,minlength:2,maxlength:50000
   },
     attachements:[String],
-    assetsFolderId:{type:String,required:true},
+    assetsFolderId:{type:String},
     availability:{type:String,enum:availabilityEnum ,default:availabilityEnum.public},
     allowComments:{type:String,enum:allowCommentsEnum ,default:allowCommentsEnum.allow},
     tags:[{type:Schema.Types.ObjectId,ref:"User"}],
     likes:[{type:Schema.Types.ObjectId,ref:"User"}],
-    createdBy:{type:Schema.Types.ObjectId,ref:"User",required:true},
+    createdBy:{type:Schema.Types.ObjectId,ref:"User"},
     freezedBy:{type:Schema.Types.ObjectId,ref:"User"},
     freezedAt:Date,
     restoredAt:Date,

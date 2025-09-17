@@ -9,6 +9,17 @@ class DataBaseRepository {
     async findOne({ filter, select }) {
         return await this.model.findOne(filter).select(select || "");
     }
+    async find({ filter, select, options, }) {
+        return this.model
+            .find(filter ?? {}, null, options)
+            .select(select ?? "")
+            .exec();
+    }
+    async findByIdAndUpdate({ id, update, options = { new: true }, }) {
+        return this.model.findByIdAndUpdate(id, {
+            ...update, $inc: { __v: 1 }
+        }, options);
+    }
     async create({ data, options, }) {
         return await this.model.create(data, options);
     }

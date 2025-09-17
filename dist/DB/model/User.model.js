@@ -71,5 +71,15 @@ userSchema.post("save", async function (doc, next) {
     }
     next();
 });
+userSchema.pre(["find", "findOne"], function (next) {
+    const query = this.getQuery();
+    if (query.paranoid === false) {
+        this.setQuery({ ...query });
+    }
+    else {
+        this.setQuery({ ...query, freezedAt: { $exists: false } });
+    }
+    next();
+});
 exports.UserModel = mongoose_1.models.User || (0, mongoose_1.model)("User", userSchema);
 //# sourceMappingURL=User.model.js.map

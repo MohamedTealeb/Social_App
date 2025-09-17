@@ -11,6 +11,9 @@ export const validation =(schema:SchemaType)=>{
 const errors:{key:KetReqType,issue:{path:string|number|symbol|undefined,message:string}[]}[]=[]
         for(const key of Object.keys(schema)as KetReqType[]){
             if(!schema[key])continue
+            if(req.file){
+                req.body.attachments=req.file
+            }
             const validationResult=schema[key]?.safeParse(req[key]);
             if(!validationResult.success){
                 errors.push({key,issue:validationResult.error.issues.map(issue=>{
@@ -49,7 +52,7 @@ export const generalFields={
  password:z.string().min(6,{error:"min password length is 6"}),
  confirmPassword:z.string(),
 gender: z.nativeEnum(GenderEnum).optional(),
-otp:z.string().regex(/^\d{6}$/)
+otp:z.string().regex(/^\d{6}$/)    
 
 
 }

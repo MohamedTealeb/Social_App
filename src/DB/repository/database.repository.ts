@@ -1,4 +1,4 @@
-import { CreateOptions, HydratedDocument, Model,  MongooseUpdateQueryOptions, ProjectionType, QueryOptions, RootFilterQuery, UpdateQuery, UpdateWriteOpResult } from "mongoose";
+import { CreateOptions, HydratedDocument, Model,  MongooseUpdateQueryOptions, ProjectionType, QueryOptions, RootFilterQuery, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 
 export abstract class DataBaseRepository<TDocument>{
     constructor(protected readonly model:Model<TDocument>){}
@@ -9,6 +9,36 @@ async findOne({filter,select}:
         options?:QueryOptions<TDocument>|null}):Promise<HydratedDocument<TDocument>|null>{
     return await this.model.findOne(filter).select(select||"")
 }
+async find({
+  filter,
+  select,
+  options,
+}: {
+  filter?: RootFilterQuery<TDocument>;
+  select?: ProjectionType<TDocument> | null;
+  options?: QueryOptions<TDocument> | null;
+}): Promise<HydratedDocument<TDocument>[]> {
+  return this.model
+    .find(filter ?? {}, null, options)
+    .select(select ?? "")
+    .exec() as Promise<HydratedDocument<TDocument>[]>;
+}
+async findByIdAndUpdate({
+    id,
+    update,
+    options={new:true},
+}:{
+    id:Types.ObjectId;
+    update?:UpdateQuery<TDocument>;
+    options?:QueryOptions<TDocument>|null;
+
+
+}):Promise<HydratedDocument<TDocument>|null>{
+    return this.model.findByIdAndUpdate(id,{
+        ...update,$inc:{__v:1}
+    },options)
+}
+
 
     async  create({
         data,
@@ -20,6 +50,7 @@ async findOne({filter,select}:
     }):Promise<HydratedDocument<TDocument>[]| undefined> {
       return  await this.model.create(data,options);
     }
+
 
 async updateOne({
 filter,

@@ -4,6 +4,7 @@ import postService from './post.service'
 
 const router=Router()
 
- router.post("/",authentication(),postService.createPost)
+ router.post("/add",authentication(),postService.createPost)
+ router.patch("/like/:postId",authentication(),postService.likePost)
 
 export default router
