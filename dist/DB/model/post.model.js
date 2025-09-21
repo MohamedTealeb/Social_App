@@ -31,25 +31,5 @@ const postSchema = new mongoose_1.Schema({
 }, {
     timestamps: true
 });
-postSchema.pre(["find", "findOne"], function (next) {
-    const query = this.getQuery();
-    if (query.paranoid === false) {
-        this.setQuery({ ...query });
-    }
-    else {
-        this.setQuery({ ...query, freezedAt: { $exists: false } });
-    }
-    next();
-});
-postSchema.pre(["updateOne", "findOneAndUpdate"], function (next) {
-    const query = this.getQuery();
-    if (query.paranoid === false) {
-        this.setQuery({ ...query });
-    }
-    else {
-        this.setQuery({ ...query, freezedAt: { $exists: false } });
-    }
-    next();
-});
 exports.PostModel = mongoose_1.models.Post || (0, mongoose_1.model)("Post", postSchema);
 //# sourceMappingURL=post.model.js.map

@@ -14,7 +14,7 @@ const sendEmail = async (data) => {
             pass: process.env.EMAIL_PASSWORD
         },
     });
-    const info = await transporter.sendMail({
+    await transporter.sendMail({
         ...data,
         from: `"Mr Mohamedtealeb  "<${process.env.EMAIL} >`
     });

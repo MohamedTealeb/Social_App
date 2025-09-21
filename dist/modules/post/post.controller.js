@@ -9,5 +9,6 @@ const post_service_1 = __importDefault(require("./post.service"));
 const router = (0, express_1.Router)();
 router.post("/add", (0, authentication_middlewar_1.authentication)(), post_service_1.default.createPost);
 router.patch("/like/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.likePost);
+router.patch("/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.updatePost);
 exports.default = router;
 //# sourceMappingURL=post.controller.js.map

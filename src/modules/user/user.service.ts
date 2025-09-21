@@ -4,8 +4,8 @@ import { ILpogoutDto } from "./user.dto";
 import { UpdateQuery } from "mongoose";
 import { HUserDocument, IUser, UserModel } from "../../DB/model/User.model";
 import { UserRepository } from "../../DB/repository/user.reository";
-import { TokenRepository } from "../../DB/repository/token.repository";
-import { TokenModel } from "../../DB/model/Token.model";
+// import { TokenRepository } from "../../DB/repository/token.repository";
+// import { TokenModel } from "../../DB/model/Token.model";
 import { createLoginCredentaails, createRevokeToken, LogoutEnum } from '../../utils/security/token.security';
 import { JwtPayload } from "jsonwebtoken";
 // import { uploadFile } from "multer/s3.config";
@@ -15,7 +15,7 @@ import { JwtPayload } from "jsonwebtoken";
 
  class UserService {
     private userModel=new UserRepository(UserModel)
-    private tokenModel=new TokenRepository(TokenModel)
+    // private tokenModel=new TokenRepository(TokenModel)
     constructor(){}
 
 

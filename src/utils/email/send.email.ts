@@ -15,7 +15,7 @@ const transporter:Transporter<SMTPTransport.SentMessageInfo,SMTPTransport.Option
         pass:process.env.EMAIL_PASSWORD as string
     },
 });
- const info =await transporter.sendMail({
+ await transporter.sendMail({
     ...data,
     from:`"Mr Mohamedtealeb  "<${process.env.EMAIL as string} >`
 

@@ -22,7 +22,7 @@ var providerEnm;
 const userSchema = new mongoose_1.Schema({
     firstName: { type: String, required: true, minLength: 2, maxLength: 25 },
     lastName: { type: String, required: true, minLength: 2, maxLength: 25 },
-    slug: { type: String, required: true, minLength: 2, maxLength: 51 },
+    slug: { type: String, required: false, minLength: 2, maxLength: 51 },
     email: { type: String, required: true, unique: true },
     confrimEmailOtp: { type: String },
     confirmAt: { type: Date },
@@ -37,8 +37,7 @@ const userSchema = new mongoose_1.Schema({
     role: { type: String, enum: RoleEnum, default: RoleEnum.user },
     provider: { type: String, enum: providerEnm, default: providerEnm.SYSTEM },
     profileImage: { type: String },
-    coverImages: [String],
-    friends: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
+    coverImages: [String]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
@@ -57,11 +56,11 @@ userSchema.virtual("username")
 userSchema.pre("save", async function (next) {
     this.wasNew = this.isNew;
     if (this.isModified("password")) {
-        this.password == await (0, hash_security_1.generateHash)(this.password);
+        this.password = await (0, hash_security_1.generateHash)(this.password);
     }
     if (this.isModified("confrimEmailOtp")) {
         this.confirmEmailPlainOtp = this.confrimEmailOtp;
-        this.confrimEmailOtp == await (0, hash_security_1.generateHash)(this.confrimEmailOtp);
+        this.confrimEmailOtp = await (0, hash_security_1.generateHash)(this.confrimEmailOtp);
     }
     next();
 });

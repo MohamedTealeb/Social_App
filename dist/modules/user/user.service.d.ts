@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 declare class UserService {
     private userModel;
-    private tokenModel;
     constructor();
     profile: (req: Request, res: Response) => Promise<Response>;
     profileImage: (req: Request, res: Response) => Promise<Response>;

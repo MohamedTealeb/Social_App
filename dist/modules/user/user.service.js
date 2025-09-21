@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_model_1 = require("../../DB/model/User.model");
 const user_reository_1 = require("../../DB/repository/user.reository");
-const token_repository_1 = require("../../DB/repository/token.repository");
-const Token_model_1 = require("../../DB/model/Token.model");
+// import { TokenRepository } from "../../DB/repository/token.repository";
+// import { TokenModel } from "../../DB/model/Token.model";
 const token_security_1 = require("../../utils/security/token.security");
 // import { uploadFile } from "multer/s3.config";
 class UserService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
-    tokenModel = new token_repository_1.TokenRepository(Token_model_1.TokenModel);
+    // private tokenModel=new TokenRepository(TokenModel)
     constructor() { }
     profile = async (req, res) => {
         return res.json({

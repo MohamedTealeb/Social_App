@@ -37,7 +37,6 @@ export interface IUser{
     updatedAt?:Date;
     profileImage?:string;
     coverImages?:string[]
-    friends?:Types.ObjectId[]
 
 }
 
@@ -45,7 +44,7 @@ const userSchema=new Schema<IUser>({
 
     firstName:{type:String,required:true,minLength:2,maxLength:25}, 
     lastName:{type:String,required:true,minLength:2,maxLength:25},
-    slug:{type:String,required:true,minLength:2,maxLength:51},
+    slug:{type:String,required:false,minLength:2,maxLength:51},
    
     email:{type:String,required:true,unique:true},
     confrimEmailOtp:{type:String},
@@ -61,8 +60,7 @@ const userSchema=new Schema<IUser>({
     role:{type:String,enum:RoleEnum,default:RoleEnum.user},
     provider:{type:String,enum:providerEnm,default:providerEnm.SYSTEM},
     profileImage:{type:String},
-    coverImages:[String],
-    friends:[{type:Schema.Types.ObjectId,ref:"User"}],
+    coverImages:[String]
     
 
 },{
@@ -87,11 +85,11 @@ userSchema.virtual("username")
     this.wasNew=this.isNew
   
     if(this.isModified("password")){
-      this.password==await generateHash(this.password)
+      this.password=await generateHash(this.password)
     }
     if(this.isModified("confrimEmailOtp")){
       this.confirmEmailPlainOtp=this.confrimEmailOtp as string
-      this.confrimEmailOtp==await generateHash(this.confrimEmailOtp as string)
+      this.confrimEmailOtp=await generateHash(this.confrimEmailOtp as string)
     }
     next()
   })
