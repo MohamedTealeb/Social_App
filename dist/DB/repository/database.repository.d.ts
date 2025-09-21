@@ -7,6 +7,19 @@ export declare abstract class DataBaseRepository<TDocument> {
         select?: ProjectionType<TDocument> | null;
         options?: QueryOptions<TDocument> | null;
     }): Promise<HydratedDocument<TDocument> | null>;
+    paginte({ filter, options, select, page, size, }: {
+        filter: RootFilterQuery<TDocument>;
+        select?: ProjectionType<TDocument> | undefined;
+        options?: QueryOptions<TDocument> | undefined;
+        page?: number | "all";
+        size?: number;
+    }): Promise<{
+        decsCount?: number;
+        limit?: number;
+        pages?: number;
+        currentPage?: number;
+        resault: HydratedDocument<TDocument>[];
+    }>;
     find({ filter, select, options, }: {
         filter?: RootFilterQuery<TDocument>;
         select?: ProjectionType<TDocument> | null;
@@ -18,9 +31,13 @@ export declare abstract class DataBaseRepository<TDocument> {
         options?: QueryOptions<TDocument> | null;
     }): Promise<HydratedDocument<TDocument> | null>;
     create({ data, options, }: {
+        data: Partial<TDocument>;
+        options?: CreateOptions | undefined;
+    }): Promise<HydratedDocument<TDocument>>;
+    createMany({ data, options, }: {
         data: Partial<TDocument>[];
         options?: CreateOptions | undefined;
-    }): Promise<HydratedDocument<TDocument>[] | undefined>;
+    }): Promise<HydratedDocument<TDocument>[]>;
     updateOne({ filter, update, options }: {
         filter: RootFilterQuery<TDocument>;
         update: UpdateQuery<TDocument>;

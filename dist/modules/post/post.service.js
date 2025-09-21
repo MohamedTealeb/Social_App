@@ -1,11 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.postAvailability = void 0;
 const post_repository_1 = require("../../DB/repository/post.repository");
 const post_model_1 = require("../../DB/model/post.model");
 const user_reository_1 = require("../../DB/repository/user.reository");
 const User_model_1 = require("../../DB/model/User.model");
 const error_response_1 = require("../../utils/response/error.response");
 const mongoose_1 = require("mongoose");
+const postAvailability = (req) => {
+    return [
+        { availability: post_model_1.availabilityEnum.public },
+        { availability: post_model_1.availabilityEnum.friends, createdBy: req.user?._id },
+        { availability: post_model_1.availabilityEnum.onlyMe, createdBy: req.user?._id },
+        { availability: post_model_1.availabilityEnum.onlyMe, createdBy: req.user?._id, tags: { $in: [req.user?._id] } }
+    ];
+};
+exports.postAvailability = postAvailability;
 class PostService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
     postModel = new post_repository_1.PostRepository(post_model_1.PostModel);
@@ -128,6 +138,17 @@ class PostService {
             success: true,
             message: "Post updated successfully",
             post: updatedPost
+        });
+    };
+    postList = async (req, res) => {
+        let { page, size } = req.query;
+        const posts = await this.postModel.paginte({ filter: {
+                $or: (0, exports.postAvailability)(req)
+            }, page, size });
+        return res.status(200).json({
+            success: true,
+            message: "Posts retrieved successfully",
+            posts: posts
         });
     };
 }

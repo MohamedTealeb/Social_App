@@ -1,10 +1,18 @@
 import { Request, Response } from "express";
 import { PostRepository } from "../../DB/repository/post.repository";
-import { PostModel } from "../../DB/model/post.model";
+import { availabilityEnum, PostModel } from "../../DB/model/post.model";
 import { UserRepository } from "../../DB/repository/user.reository";
 import { UserModel } from "../../DB/model/User.model";
 import { Notfound } from "../../utils/response/error.response";
 import { Types } from "mongoose";
+export const postAvailability = (req: Request) => {
+  return [
+    {availability:availabilityEnum.public},
+    {availability:availabilityEnum.friends,createdBy:req.user?._id},
+    {availability:availabilityEnum.onlyMe,createdBy:req.user?._id},
+    {availability:availabilityEnum.onlyMe,createdBy:req.user?._id,tags:{$in:[req.user?._id]}}
+  ]
+}
 
 
 class PostService {
@@ -164,6 +172,19 @@ class PostService {
             message: "Post updated successfully",
             post: updatedPost
         });
+    }
+    postList = async (req: Request, res: Response): Promise<Response> => {
+      let {page,size}=req.query as unknown as {page:number,size:number}
+     
+      const posts = await this.postModel.paginte({filter:{
+        $or:postAvailability(req)
+      },page,size});
+
+      return res.status(200).json({
+        success: true,
+        message: "Posts retrieved successfully",
+        posts: posts
+      });
     }
 
 }

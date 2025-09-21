@@ -1,4 +1,4 @@
-import { CreateOptions, HydratedDocument, Model,  MongooseUpdateQueryOptions, ProjectionType, QueryOptions, RootFilterQuery, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
+import { CreateOptions, HydratedDocument, Model, MongooseUpdateQueryOptions, ProjectionType, QueryOptions, RootFilterQuery, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 
 export abstract class DataBaseRepository<TDocument>{
     constructor(protected readonly model:Model<TDocument>){}
@@ -9,6 +9,38 @@ async findOne({filter,select}:
         options?:QueryOptions<TDocument>|null}):Promise<HydratedDocument<TDocument>|null>{
     return await this.model.findOne(filter).select(select||"")
 }
+async paginte({
+    filter={},
+    options={},
+    select,
+    page=1,
+    size=5,
+}:{
+    filter:RootFilterQuery<TDocument>,
+    select?:ProjectionType<TDocument>|undefined,
+    options?:QueryOptions<TDocument>|undefined,
+    page?:number|"all",
+    size?:number,
+}):Promise<{decsCount?: number, limit?: number, pages?: number, currentPage?: number, resault: HydratedDocument<TDocument>[]}>{ 
+
+let decsCount:number|undefined=undefined
+let pages:number|undefined=undefined
+if(page!="all"){
+    pages=Math.floor(page<1?1:page)
+options.limit=Math.floor(size<1||!size?5:size)
+options.skip=Math.floor((pages-1)*options.limit)
+decsCount=await this.model.countDocuments(filter)
+pages=Math.ceil(decsCount/options.limit)
+}
+const resault=await this.model.find(filter,select,options)
+return {
+    decsCount: decsCount || 0,
+    limit: options.limit || 0,
+    pages: pages || 0,
+    currentPage: pages || 0,
+    resault
+}}
+   
 async find({
   filter,
   select,
@@ -44,11 +76,27 @@ async findByIdAndUpdate({
         data,
         options,
     }:{
+        data:Partial<TDocument>;
+    
+        options?:CreateOptions|undefined
+    }):Promise<HydratedDocument<TDocument>> {
+      if (options) {
+        const created = await this.model.create([data], options);
+        return created[0] as HydratedDocument<TDocument>;
+      } else {
+        return await this.model.create(data) as HydratedDocument<TDocument>;
+      }
+    }
+
+    async  createMany({
+        data,
+        options,
+    }:{
         data:Partial<TDocument>[];
     
         options?:CreateOptions|undefined
-    }):Promise<HydratedDocument<TDocument>[]| undefined> {
-      return  await this.model.create(data,options);
+    }):Promise<HydratedDocument<TDocument>[]> {
+      return  await this.model.create(data,options) as HydratedDocument<TDocument>[];
     }
 
 
