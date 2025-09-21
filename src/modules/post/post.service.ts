@@ -1,11 +1,21 @@
 import { Request, Response } from "express";
 import { PostRepository } from "../../DB/repository/post.repository";
-import { PostModel } from "../../DB/model/post.model";
+import { availabilityEnum, PostModel } from "../../DB/model/post.model";
 import { UserRepository } from "../../DB/repository/user.reository";
 import { UserModel } from "../../DB/model/User.model";
 import { Notfound } from "../../utils/response/error.response";
 import { Types } from "mongoose";
+export const postAvailability=(req:Request)=>{
 
+return [
+                      {availability:availabilityEnum.public},
+                      {availability:availabilityEnum.friends,createdBy:{$in:[...(req.user?.friends||[]),req.user?._id]}},
+                      {availability:{$ne:availabilityEnum.onlyMe},tags:{$in:[req.user?._id]}},
+                      {availability:availabilityEnum.onlyMe,createdBy:req.user?._id}
+                    ]
+
+
+}
 
 class PostService {
   private userModel = new UserRepository(UserModel);
@@ -75,19 +85,23 @@ class PostService {
         let updatedPost;
         if (isLiked) {
            
-            updatedPost = await this.postModel.findByIdAndUpdate({
-                id: new Types.ObjectId(postId),
-                update: { $pull: { likes: userObjectId } },
-                options: { new: true }
+            updatedPost = await this.postModel.updateOne({
+                filter: {
+                    _id: new Types.ObjectId(postId),
+                    $or:postAvailability(req)
+                },
+                update: { $pull: { likes: userObjectId } }
             });
         } else {
            
-            updatedPost = await this.postModel.findByIdAndUpdate({
-                id: new Types.ObjectId(postId),
-                update: { $addToSet: { likes: userObjectId } },
-                options: { new: true }
+            await this.postModel.updateOne({
+                filter: { _id: new Types.ObjectId(postId) },
+                update: { $addToSet: { likes: userObjectId } }
             });
         }
+
+        // Fetch the updated post
+        updatedPost = await this.postModel.findOne({ filter: { _id: new Types.ObjectId(postId) } });
 
         return res.status(200).json({
             success: true,

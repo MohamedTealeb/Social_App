@@ -1,11 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.postAvailability = void 0;
 const post_repository_1 = require("../../DB/repository/post.repository");
 const post_model_1 = require("../../DB/model/post.model");
 const user_reository_1 = require("../../DB/repository/user.reository");
 const User_model_1 = require("../../DB/model/User.model");
 const error_response_1 = require("../../utils/response/error.response");
 const mongoose_1 = require("mongoose");
+const postAvailability = (req) => {
+    return [
+        { availability: post_model_1.availabilityEnum.public },
+        { availability: post_model_1.availabilityEnum.friends, createdBy: { $in: [...(req.user?.friends || []), req.user?._id] } },
+        { availability: { $ne: post_model_1.availabilityEnum.onlyMe }, tags: { $in: [req.user?._id] } },
+        { availability: post_model_1.availabilityEnum.onlyMe, createdBy: req.user?._id }
+    ];
+};
+exports.postAvailability = postAvailability;
 class PostService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
     postModel = new post_repository_1.PostRepository(post_model_1.PostModel);
@@ -55,19 +65,22 @@ class PostService {
         const isLiked = existingPost.likes?.some(likeId => likeId.toString() === userObjectId.toString()) || false;
         let updatedPost;
         if (isLiked) {
-            updatedPost = await this.postModel.findByIdAndUpdate({
-                id: new mongoose_1.Types.ObjectId(postId),
-                update: { $pull: { likes: userObjectId } },
-                options: { new: true }
+            updatedPost = await this.postModel.updateOne({
+                filter: {
+                    _id: new mongoose_1.Types.ObjectId(postId),
+                    $or: (0, exports.postAvailability)(req)
+                },
+                update: { $pull: { likes: userObjectId } }
             });
         }
         else {
-            updatedPost = await this.postModel.findByIdAndUpdate({
-                id: new mongoose_1.Types.ObjectId(postId),
-                update: { $addToSet: { likes: userObjectId } },
-                options: { new: true }
+            await this.postModel.updateOne({
+                filter: { _id: new mongoose_1.Types.ObjectId(postId) },
+                update: { $addToSet: { likes: userObjectId } }
             });
         }
+        // Fetch the updated post
+        updatedPost = await this.postModel.findOne({ filter: { _id: new mongoose_1.Types.ObjectId(postId) } });
         return res.status(200).json({
             success: true,
             message: isLiked ? "Post unliked successfully" : "Post liked successfully",

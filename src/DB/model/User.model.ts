@@ -37,6 +37,7 @@ export interface IUser{
     updatedAt?:Date;
     profileImage?:string;
     coverImages?:string[]
+    friends?:Types.ObjectId[]
 
 }
 
@@ -60,7 +61,8 @@ const userSchema=new Schema<IUser>({
     role:{type:String,enum:RoleEnum,default:RoleEnum.user},
     provider:{type:String,enum:providerEnm,default:providerEnm.SYSTEM},
     profileImage:{type:String},
-    coverImages:[String]
+    coverImages:[String],
+    friends:[{type:Schema.Types.ObjectId,ref:"User"}],
     
 
 },{
