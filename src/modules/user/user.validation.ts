@@ -1,4 +1,3 @@
-
 import { LogoutEnum } from '../../utils/security/token.security'
 import {z} from 'zod'
 
@@ -17,8 +16,6 @@ params:z.strictObject({
 
 
 
-
-
 }
     export const acceptFriendRequest={
 
@@ -29,6 +26,10 @@ params:z.strictObject({
 
 
 
+}
 
-
+export const updateEmail={
+    body:z.strictObject({
+        email:z.string().email("Invalid email format").min(1,"Email is required")
+    })
 }

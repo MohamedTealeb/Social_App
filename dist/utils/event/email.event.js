@@ -17,7 +17,7 @@ exports.emailEvent.on("confirmEmail", async (data) => {
 });
 exports.emailEvent.on("resetPassword", async (data) => {
     try {
-        data.subject = "Reset-Password;";
+        data.subject = "Reset-Password";
         data.html = (0, verify_template_1.verifyEmail)({ otp: data.otp, title: "Reset Password" });
         await (0, send_email_1.sendEmail)(data);
     }

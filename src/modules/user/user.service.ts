@@ -1,5 +1,5 @@
 import {  Request, Response } from "express";
-import { ILpogoutDto } from "./user.dto";
+import { ILpogoutDto, IUpdateEmailDto } from "./user.dto";
 
 import { UpdateQuery } from "mongoose";
 import { HUserDocument, IUser, UserModel } from "../../DB/model/User.model";
@@ -33,7 +33,6 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
             throw new Notfound("profile not found")
         }
 
-        // Get friends from friend requests
         const friendRequests = await this.friendRequestModel.find({
             filter: {
                 $or: [
@@ -49,13 +48,10 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
             }
         });
 
-        // Extract friends from the requests
         const friends = friendRequests.map(request => {
-            // If I sent the request, the friend is sendTo
             if (request.createdBy._id.toString() === req.user?._id.toString()) {
                 return request.sendTo;
             }
-            // If I received the request, the friend is createdBy
             return request.createdBy;
         });
 
@@ -142,10 +138,10 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
             if(!user){
                 throw new Notfound("user not found")
             }
-            const [friendRequest]=await this.friendRequestModel.create({data:[{
+            const friendRequest=await this.friendRequestModel.create({data:{
                 createdBy:req.user?._id as Types.ObjectId,
                 sendTo:userId as Types.ObjectId
-            }]})||[]
+            }})
             if(!friendRequest){
                 throw new BadReauest("fail to create friend request")
             }
@@ -170,13 +166,38 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
                 throw new ConflictException("friend request not found")
             }
            await Promise.all([
-            this.userModel.updateOne({filter:{_id:this.friendRequest.createdBy},update:{ $addToSet:{friends:FriendRequest.sendTo}}}),
+            this.userModel.updateOne({filter:{_id:FriendRequest.createdBy},update:{ $addToSet:{friends:FriendRequest.sendTo}}}),
             this.userModel.updateOne({filter:{_id:FriendRequest.sendTo},update:{ $addToSet:{friends:FriendRequest.createdBy}}}),
            ])
         return res.status(201).json({
             message:"accepted friend request",
            status:201,
           res:FriendRequest
+        })
+    }
+
+    updateEmail=async(req:Request,res:Response):Promise<Response>=>{
+        const {email}:IUpdateEmailDto=req.body
+        
+        const existingUser = await this.userModel.findOne({filter:{email}})
+        if(existingUser && existingUser._id.toString() !== req.user?._id.toString()){
+            throw new ConflictException("Email already exists")
+        }
+        const updatedUser = await this.userModel.findOneAndUpdate({
+            filter:{_id:req.user?._id},
+            update:{email},
+            options:{new:true, select:"-password -confrimEmailOtp -resetPasswordOtp -changeCredentialTime"}
+        })
+
+        if(!updatedUser){
+            throw new Notfound("User not found")
+        }
+
+        return res.json({
+            message:"Email updated successfully",
+            data:{
+                user: updatedUser
+            }
         })
     }
 

@@ -118,14 +118,14 @@ class AuthenticationService {
             }
             throw new error_response_1.ConflictException(`Email exist with another provider ${user.provider}`);
         }
-        const [newUser] = await this.userModel.create({
-            data: [{ firstName: given_name,
-                    lastName: family_name,
-                    email: email,
-                    profileImage: picture,
-                    confirmAt: new Date(),
-                    provider: User_model_1.providerEnm.GOOGLE }]
-        }) || [];
+        const newUser = await this.userModel.create({
+            data: { firstName: given_name,
+                lastName: family_name,
+                email: email,
+                profileImage: picture,
+                confirmAt: new Date(),
+                provider: User_model_1.providerEnm.GOOGLE }
+        });
         if (!newUser) {
             throw new error_response_1.BadReauest("Fail to signup with gmail please try again later");
         }

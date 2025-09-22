@@ -1,0 +1,1 @@
+{"version":3,"file":"general.template.d.ts","sourceRoot":"","sources":["../../../src/utils/email/general.template.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,YAAY,GAAI,0BAI1B;IACD,KAAK,EAAE,MAAM,CAAC;IACd,OAAO,EAAE,MAAM,CAAC;IAChB,IAAI,CAAC,EAAE,MAAM,EAAE,CAAA;CAChB,KAAG,MAiEH,CAAC"}

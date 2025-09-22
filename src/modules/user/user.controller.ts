@@ -16,5 +16,6 @@ router.patch("/accept-friend-request/:requestId",authentication(),validation(val
 router.patch("/profile-image",authentication(),cloudFileUpload({validation:fileValidation.image,storageApproach:storaeEnum.disk}).single("image"),userService.profileImage)
 router.post("/refresh-token",authentication(TokenEnum.refresh),userService.refreshToken)
 router.post("/logout",authentication(),validation(validator.logout),userService.logout)
+router.patch("/update-email",authentication(),validation(validator.updateEmail),userService.updateEmail)
 
  export default router

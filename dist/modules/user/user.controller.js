@@ -52,5 +52,6 @@ router.patch("/accept-friend-request/:requestId", (0, authentication_middlewar_1
 router.patch("/profile-image", (0, authentication_middlewar_1.authentication)(), (0, cloud_multer_1.cloudFileUpload)({ validation: cloud_multer_1.fileValidation.image, storageApproach: cloud_multer_1.storaeEnum.disk }).single("image"), user_service_1.default.profileImage);
 router.post("/refresh-token", (0, authentication_middlewar_1.authentication)(token_security_1.TokenEnum.refresh), user_service_1.default.refreshToken);
 router.post("/logout", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.logout), user_service_1.default.logout);
+router.patch("/update-email", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.updateEmail), user_service_1.default.updateEmail);
 exports.default = router;
 //# sourceMappingURL=user.controller.js.map

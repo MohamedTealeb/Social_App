@@ -15,4 +15,9 @@ export declare const acceptFriendRequest: {
         requestId: z.ZodString;
     }, z.core.$strict>;
 };
+export declare const updateEmail: {
+    body: z.ZodObject<{
+        email: z.ZodString;
+    }, z.core.$strict>;
+};
 //# sourceMappingURL=user.validation.d.ts.map

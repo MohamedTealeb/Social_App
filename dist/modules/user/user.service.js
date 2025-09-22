@@ -22,7 +22,6 @@ class UserService {
         if (!profile) {
             throw new error_response_1.Notfound("profile not found");
         }
-        // Get friends from friend requests
         const friendRequests = await this.friendRequestModel.find({
             filter: {
                 $or: [
@@ -37,13 +36,10 @@ class UserService {
                 ]
             }
         });
-        // Extract friends from the requests
         const friends = friendRequests.map(request => {
-            // If I sent the request, the friend is sendTo
             if (request.createdBy._id.toString() === req.user?._id.toString()) {
                 return request.sendTo;
             }
-            // If I received the request, the friend is createdBy
             return request.createdBy;
         });
         return res.json({
@@ -123,10 +119,10 @@ class UserService {
         if (!user) {
             throw new error_response_1.Notfound("user not found");
         }
-        const [friendRequest] = await this.friendRequestModel.create({ data: [{
-                    createdBy: req.user?._id,
-                    sendTo: userId
-                }] }) || [];
+        const friendRequest = await this.friendRequestModel.create({ data: {
+                createdBy: req.user?._id,
+                sendTo: userId
+            } });
         if (!friendRequest) {
             throw new error_response_1.BadReauest("fail to create friend request");
         }
@@ -149,13 +145,34 @@ class UserService {
             throw new error_response_1.ConflictException("friend request not found");
         }
         await Promise.all([
-            this.userModel.updateOne({ filter: { _id: this.friendRequest.createdBy }, update: { $addToSet: { friends: FriendRequest.sendTo } } }),
+            this.userModel.updateOne({ filter: { _id: FriendRequest.createdBy }, update: { $addToSet: { friends: FriendRequest.sendTo } } }),
             this.userModel.updateOne({ filter: { _id: FriendRequest.sendTo }, update: { $addToSet: { friends: FriendRequest.createdBy } } }),
         ]);
         return res.status(201).json({
             message: "accepted friend request",
             status: 201,
             res: FriendRequest
+        });
+    };
+    updateEmail = async (req, res) => {
+        const { email } = req.body;
+        const existingUser = await this.userModel.findOne({ filter: { email } });
+        if (existingUser && existingUser._id.toString() !== req.user?._id.toString()) {
+            throw new error_response_1.ConflictException("Email already exists");
+        }
+        const updatedUser = await this.userModel.findOneAndUpdate({
+            filter: { _id: req.user?._id },
+            update: { email },
+            options: { new: true, select: "-password -confrimEmailOtp -resetPasswordOtp -changeCredentialTime" }
+        });
+        if (!updatedUser) {
+            throw new error_response_1.Notfound("User not found");
+        }
+        return res.json({
+            message: "Email updated successfully",
+            data: {
+                user: updatedUser
+            }
         });
     };
 }

@@ -127,8 +127,8 @@ const credentials=await createLoginCredentaails(user)
                 }
                 throw new ConflictException(`Email exist with another provider ${user.provider}`)
             }
-            const [newUser]=await this.userModel.create({
-                data:[{firstName:given_name as string,
+            const newUser=await this.userModel.create({
+                data:{firstName:given_name as string,
                     lastName:family_name as string,
                     email:email as string,
                     profileImage:picture as string,
@@ -136,8 +136,8 @@ const credentials=await createLoginCredentaails(user)
                     provider:providerEnm.GOOGLE
 
                 
-                }]
-            })||[]
+                }
+            })
             if(!newUser){
                 throw new BadReauest("Fail to signup with gmail please try again later")
             } 
@@ -265,6 +265,7 @@ if(!result.matchedCount){
 
 
         }
+
         
     }
 
