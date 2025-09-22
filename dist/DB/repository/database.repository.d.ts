@@ -30,6 +30,11 @@ export declare abstract class DataBaseRepository<TDocument> {
         update?: UpdateQuery<TDocument>;
         options?: QueryOptions<TDocument> | null;
     }): Promise<HydratedDocument<TDocument> | null>;
+    findOneAndUpdate({ filter, update, options, }: {
+        filter: RootFilterQuery<TDocument>;
+        update?: UpdateQuery<TDocument>;
+        options?: QueryOptions<TDocument> | null;
+    }): Promise<HydratedDocument<TDocument> | null>;
     create({ data, options, }: {
         data: Partial<TDocument>;
         options?: CreateOptions | undefined;

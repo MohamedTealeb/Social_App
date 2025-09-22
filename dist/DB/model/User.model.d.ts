@@ -5,7 +5,8 @@ export declare enum GenderEnum {
 }
 export declare enum RoleEnum {
     user = "user",
-    admin = "admin"
+    admin = "admin",
+    superAdmin = "superAdmin"
 }
 export declare enum providerEnm {
     GOOGLE = "GOOGLE",

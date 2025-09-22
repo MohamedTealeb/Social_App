@@ -7,3 +7,28 @@ export const logout={
         flag:z.enum(LogoutEnum).default(LogoutEnum.only)
     })
 }
+
+export const friendRequest={
+
+params:z.strictObject({
+    userId:z.string()
+})
+
+
+
+
+
+
+}
+    export const acceptFriendRequest={
+
+params:z.strictObject({
+    requestId:z.string()
+})
+
+
+
+
+
+
+}

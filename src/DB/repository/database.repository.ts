@@ -71,6 +71,20 @@ async findByIdAndUpdate({
     },options)
 }
 
+async findOneAndUpdate({
+    filter,
+    update,
+    options={new:true},
+}:{
+    filter:RootFilterQuery<TDocument>;
+    update?:UpdateQuery<TDocument>;
+    options?:QueryOptions<TDocument>|null;
+}):Promise<HydratedDocument<TDocument>|null>{
+    return this.model.findOneAndUpdate(filter,{
+        ...update,$inc:{__v:1}
+    },options)
+}
+
 
     async  create({
         data,

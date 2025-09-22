@@ -13,6 +13,7 @@ var RoleEnum;
 (function (RoleEnum) {
     RoleEnum["user"] = "user";
     RoleEnum["admin"] = "admin";
+    RoleEnum["superAdmin"] = "superAdmin";
 })(RoleEnum || (exports.RoleEnum = RoleEnum = {}));
 var providerEnm;
 (function (providerEnm) {

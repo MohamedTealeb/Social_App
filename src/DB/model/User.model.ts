@@ -10,7 +10,8 @@ female="female"
 }
 export enum RoleEnum{
 user="user",
-admin="admin"
+admin="admin",
+superAdmin="superAdmin"
 }
 export enum providerEnm{
 GOOGLE="GOOGLE",

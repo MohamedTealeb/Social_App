@@ -9,12 +9,19 @@ import { UserRepository } from "../../DB/repository/user.reository";
 import { createLoginCredentaails, createRevokeToken, LogoutEnum } from '../../utils/security/token.security';
 import { JwtPayload } from "jsonwebtoken";
 // import { uploadFile } from "multer/s3.config";
-
+import { PostModel } from './../../DB/model/post.model';
+import { PostRepository } from "../../DB/repository/post.repository";
+import { FriendRequestRepository } from "../../DB/repository/friendRequest.repository";
+import { FriendRequestModel } from "../../DB/model/friendRequest.model";
+import { Types } from "mongoose";
+import { BadReauest, ConflictException, Notfound } from "../../utils/response/error.response"
  
 
 
  class UserService {
     private userModel=new UserRepository(UserModel)
+    private postModel=new PostRepository(PostModel)
+    private friendRequestModel=new FriendRequestRepository(FriendRequestModel)
     // private tokenModel=new TokenRepository(TokenModel)
     constructor(){}
 
@@ -27,6 +34,17 @@ import { JwtPayload } from "jsonwebtoken";
             date:{
                 user:req.user,
                 decoded:req.decoded
+            }
+        })
+    }
+    dashboard=async(req:Request,res:Response):Promise<Response>=>{
+           
+       const result=await Promise.allSettled([this.userModel.find({filter:{}}),this.postModel.find({filter:{}})])
+        return res.json({
+            message:"Done",
+            date:{
+               
+                   result
             }
         })
     }
@@ -80,5 +98,57 @@ import { JwtPayload } from "jsonwebtoken";
             }
         })
     }
+    friendRequest=async(req:Request,res:Response):Promise<Response>=>{
+        const {userId}=req.params as unknown as {userId:Types.ObjectId}
+        const checkFriendRequest=await this.friendRequestModel.findOne({filter:{
+            createdBy:{$in:[ req.user?._id ,userId]},
+            sendTo:{$in:[req.user?._id,userId]}
+        }}
+        )
+            if(checkFriendRequest){
+                throw new ConflictException("friend request already exist")
+            }
+            const user= await this.userModel.findOne({filter:{_id:userId}})
+            if(!user){
+                throw new Notfound("user not found")
+            }
+            const [friendRequest]=await this.friendRequestModel.create({data:[{
+                createdBy:req.user?._id as Types.ObjectId,
+                sendTo:userId as Types.ObjectId
+            }]})||[]
+            if(!friendRequest){
+                throw new BadReauest("fail to create friend request")
+            }
+        return res.status(201).json({
+            message:"Done",
+           status:201,
+           data:{
+            friendRequest
+           }
+        })
+    }
+    acceptFriendRequest=async(req:Request,res:Response):Promise<Response>=>{
+        const {requestId}=req.params as unknown as {requestId:Types.ObjectId}
+        const FriendRequest=await this.friendRequestModel.findOneAndUpdate({filter:{
+            _id:requestId,
+            sendTo:req.user?._id,
+            acceptedAt:{$exists:false}
+
+        },update:{acceptedAt:new Date()}}
+        )
+            if(!FriendRequest){
+                throw new ConflictException("friend request not found")
+            }
+           await Promise.all([
+            this.userModel.updateOne({filter:{_id:this.friendRequest.createdBy},update:{ $addToSet:{friends:FriendRequest.sendTo}}}),
+            this.userModel.updateOne({filter:{_id:FriendRequest.sendTo},update:{ $addToSet:{friends:FriendRequest.createdBy}}}),
+           ])
+        return res.status(201).json({
+            message:"accepted friend request",
+           status:201,
+          res:FriendRequest
+        })
+    }
+
  }
  export default new UserService()

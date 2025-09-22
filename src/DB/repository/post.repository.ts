@@ -1,7 +1,7 @@
 import { DataBaseRepository } from "./database.repository";
 
 import { IPost as TDocument } from '../model/post.model';
-import { HydratedDocument, Model, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery } from 'mongoose';
+import {  Model, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery } from 'mongoose';
 import { CommentModel } from './../model/comment.model';
 import { CommentRepository } from "./comment.repository";
 

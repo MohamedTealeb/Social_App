@@ -39,6 +39,11 @@ class DataBaseRepository {
             ...update, $inc: { __v: 1 }
         }, options);
     }
+    async findOneAndUpdate({ filter, update, options = { new: true }, }) {
+        return this.model.findOneAndUpdate(filter, {
+            ...update, $inc: { __v: 1 }
+        }, options);
+    }
     async create({ data, options, }) {
         if (options) {
             const created = await this.model.create([data], options);
