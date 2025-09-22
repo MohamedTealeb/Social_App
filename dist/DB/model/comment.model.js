@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentModel = void 0;
 const mongoose_1 = require("mongoose");
-const postSchema = new mongoose_1.Schema({
+const commentSchema = new mongoose_1.Schema({
     createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
     postId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Post" },
     commentId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Comment" },
@@ -17,7 +17,15 @@ const postSchema = new mongoose_1.Schema({
     restoredAt: Date,
     restoredBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
 }, {
-    timestamps: true
+    timestamps: true,
+    strictQuery: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
 });
-exports.CommentModel = mongoose_1.models.Comment || (0, mongoose_1.model)("Comment", postSchema);
+commentSchema.virtual("reply", {
+    ref: "Comment",
+    localField: "_id",
+    foreignField: "commentId",
+});
+exports.CommentModel = mongoose_1.models.Comment || (0, mongoose_1.model)("Comment", commentSchema);
 //# sourceMappingURL=comment.model.js.map

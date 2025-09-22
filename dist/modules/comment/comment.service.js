@@ -42,7 +42,7 @@ class CommentService {
             data: {
                 ...req.body,
                 postId,
-                commentId: commentId, // مهم عشان تحدد إنه رد
+                commentId: commentId,
                 createdBy: req.user?._id,
             }
         });

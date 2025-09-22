@@ -7,6 +7,8 @@ const user_reository_1 = require("../../DB/repository/user.reository");
 const User_model_1 = require("../../DB/model/User.model");
 const error_response_1 = require("../../utils/response/error.response");
 const mongoose_1 = require("mongoose");
+const comment_repository_1 = require("../../DB/repository/comment.repository");
+const comment_model_1 = require("../../DB/model/comment.model");
 const postAvailability = (req) => {
     return [
         { availability: post_model_1.availabilityEnum.public },
@@ -19,6 +21,7 @@ exports.postAvailability = postAvailability;
 class PostService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
     postModel = new post_repository_1.PostRepository(post_model_1.PostModel);
+    commentModel = new comment_repository_1.CommentRepository(comment_model_1.CommentModel);
     constructor() { }
     createPost = async (req, res) => {
         let processedTags = [];
@@ -141,14 +144,19 @@ class PostService {
         });
     };
     postList = async (req, res) => {
-        let { page, size } = req.query;
-        const posts = await this.postModel.paginte({ filter: {
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 5;
+        const posts = await this.postModel.findcursor({
+            filter: {
                 $or: (0, exports.postAvailability)(req)
-            }, page, size });
+            },
+            page,
+            size
+        });
         return res.status(200).json({
             success: true,
             message: "Posts retrieved successfully",
-            posts: posts
+            ...posts
         });
     };
 }

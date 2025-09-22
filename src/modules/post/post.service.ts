@@ -5,6 +5,8 @@ import { UserRepository } from "../../DB/repository/user.reository";
 import { UserModel } from "../../DB/model/User.model";
 import { Notfound } from "../../utils/response/error.response";
 import { Types } from "mongoose";
+import { CommentRepository } from "../../DB/repository/comment.repository";
+import { CommentModel } from "../../DB/model/comment.model";
 export const postAvailability = (req: Request) => {
   return [
     {availability:availabilityEnum.public},
@@ -18,6 +20,7 @@ export const postAvailability = (req: Request) => {
 class PostService {
   private userModel = new UserRepository(UserModel);
   private postModel = new PostRepository(PostModel);
+  private commentModel = new CommentRepository(CommentModel);
   
   constructor() {}
 
@@ -174,16 +177,21 @@ class PostService {
         });
     }
     postList = async (req: Request, res: Response): Promise<Response> => {
-      let {page,size}=req.query as unknown as {page:number,size:number}
-     
-      const posts = await this.postModel.paginte({filter:{
-        $or:postAvailability(req)
-      },page,size});
-
+      const page = parseInt(req.query.page as string) || 1;
+      const size = parseInt(req.query.size as string) || 5;
+      
+      const posts = await this.postModel.findcursor({
+        filter:{
+          $or:postAvailability(req)
+        },
+        page,
+        size
+      });
+      
       return res.status(200).json({
         success: true,
         message: "Posts retrieved successfully",
-        posts: posts
+        ...posts
       });
     }
 

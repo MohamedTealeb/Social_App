@@ -29,7 +29,16 @@ const postSchema = new mongoose_1.Schema({
     restoredAt: Date,
     restoredBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
 }, {
-    timestamps: true
+    timestamps: true,
+    strictQuery: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
+});
+postSchema.virtual("comments", {
+    ref: "Comment",
+    localField: "_id",
+    foreignField: "postId",
+    justOne: false
 });
 exports.PostModel = mongoose_1.models.Post || (0, mongoose_1.model)("Post", postSchema);
 //# sourceMappingURL=post.model.js.map

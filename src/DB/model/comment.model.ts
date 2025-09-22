@@ -24,7 +24,7 @@ commentId?:Types.ObjectId
 
 }
 export type HPostDocument=HydratedDocument<Icomment>
-const postSchema=new Schema<Icomment>(
+const commentSchema=new Schema<Icomment>(
 {
 createdBy:{type:Schema.Types.ObjectId,ref:"User"},
 postId:{type:Schema.Types.ObjectId,ref:"Post"},
@@ -44,12 +44,21 @@ commentId:{type:Schema.Types.ObjectId,ref:"Comment"},
 
 
 },{
-    timestamps:true
+    timestamps:true,
+    strictQuery:true,
+    toObject:{virtuals:true},
+    toJSON:{virtuals:true}
 }
 
 
 
 
 )
+commentSchema.virtual("reply",{
+  ref:"Comment",
+  localField:"_id",
+  foreignField:"commentId",
+})
 
-export const CommentModel= models.Comment||model<Icomment>("Comment",postSchema)
+
+export const CommentModel= models.Comment||model<Icomment>("Comment",commentSchema)

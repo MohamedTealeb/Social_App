@@ -24,7 +24,7 @@ class DataBaseRepository {
             decsCount: decsCount || 0,
             limit: options.limit || 0,
             pages: pages || 0,
-            currentPage: pages || 0,
+            currentPage: typeof page === 'number' ? Math.floor(page < 1 ? 1 : page) : 1,
             resault
         };
     }

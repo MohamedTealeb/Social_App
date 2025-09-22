@@ -52,12 +52,22 @@ const postSchema=new Schema<IPost>(
 
 
 },{
-    timestamps:true
+    timestamps:true,
+    strictQuery:true,
+    toObject:{virtuals:true},
+    toJSON:{virtuals:true}
 }
 
 
 
 
 )
+
+postSchema.virtual("comments",{
+  ref:"Comment",
+  localField:"_id",
+  foreignField:"postId",
+  justOne:false
+})
 
 export const PostModel= models.Post||model<IPost>("Post",postSchema)

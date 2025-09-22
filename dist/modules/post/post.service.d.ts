@@ -19,6 +19,7 @@ export declare const postAvailability: (req: Request) => ({
 declare class PostService {
     private userModel;
     private postModel;
+    private commentModel;
     constructor();
     createPost: (req: Request, res: Response) => Promise<Response>;
     likePost: (req: Request, res: Response) => Promise<Response>;

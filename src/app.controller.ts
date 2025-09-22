@@ -12,10 +12,6 @@ import {rateLimit}from 'express-rate-limit';
 import { globalErrorHandling } from './utils/response/error.response';
 import connectDB from './DB/connections.db';
 
-
-
-
-
 const bootstrap=async():Promise<void>=>{
 const port:number|string=process.env.PORT||5000;
 const app:Express=express()
@@ -34,6 +30,8 @@ app.get('/',(req:Request,res:Response,next:NextFunction)=>{
    return res.status(200).json({
     message:"Welcome to the Social App API"
    })
+   
+
 })
 app.use("/auth",authController)
 app.use("/user",userController)
