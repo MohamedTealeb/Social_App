@@ -18,11 +18,39 @@ class UserService {
     // private tokenModel=new TokenRepository(TokenModel)
     constructor() { }
     profile = async (req, res) => {
+        const profile = await this.userModel.findOne({ filter: { _id: req.user?._id } });
+        if (!profile) {
+            throw new error_response_1.Notfound("profile not found");
+        }
+        // Get friends from friend requests
+        const friendRequests = await this.friendRequestModel.find({
+            filter: {
+                $or: [
+                    { createdBy: req.user?._id, acceptedAt: { $exists: true } },
+                    { sendTo: req.user?._id, acceptedAt: { $exists: true } }
+                ]
+            },
+            options: {
+                populate: [
+                    { path: "createdBy", select: "firstName lastName email" },
+                    { path: "sendTo", select: "firstName lastName email" }
+                ]
+            }
+        });
+        // Extract friends from the requests
+        const friends = friendRequests.map(request => {
+            // If I sent the request, the friend is sendTo
+            if (request.createdBy._id.toString() === req.user?._id.toString()) {
+                return request.sendTo;
+            }
+            // If I received the request, the friend is createdBy
+            return request.createdBy;
+        });
         return res.json({
             message: "Done",
             date: {
-                user: req.user,
-                decoded: req.decoded
+                user: profile,
+                friends: friends
             }
         });
     };

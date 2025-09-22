@@ -54,6 +54,13 @@ userSchema.virtual("username")
     .get(function () {
     return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim();
 });
+// Virtual field for friends
+userSchema.virtual("friends", {
+    ref: "FriendRequest",
+    localField: "_id",
+    foreignField: "createdBy",
+    match: { acceptedAt: { $exists: true } }
+});
 userSchema.pre("save", async function (next) {
     this.wasNew = this.isNew;
     if (this.isModified("password")) {
