@@ -38,6 +38,7 @@ export interface IUser{
     updatedAt?:Date;
     profileImage?:string;
     coverImages?:string[]
+    blocked?:Types.ObjectId[]
 
 }
 
@@ -62,6 +63,8 @@ const userSchema=new Schema<IUser>({
     provider:{type:String,enum:providerEnm,default:providerEnm.SYSTEM},
     profileImage:{type:String},
     coverImages:[String]
+    ,
+    blocked:[{type:Schema.Types.ObjectId,ref:"User"}]
     
 
 },{

@@ -38,7 +38,8 @@ const userSchema = new mongoose_1.Schema({
     role: { type: String, enum: RoleEnum, default: RoleEnum.user },
     provider: { type: String, enum: providerEnm, default: providerEnm.SYSTEM },
     profileImage: { type: String },
-    coverImages: [String]
+    coverImages: [String],
+    blocked: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

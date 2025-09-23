@@ -176,6 +176,35 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
         })
     }
 
+    deleteFriendRequest=async(req:Request,res:Response):Promise<Response>=>{
+        const {requestId}=req.params as unknown as {requestId:Types.ObjectId}
+        const deleted=await this.friendRequestModel.findOneAndUpdate({
+            filter:{
+                _id:requestId,
+                $or:[{createdBy:req.user?._id},{sendTo:req.user?._id}]
+            },
+            update:{acceptedAt:undefined},
+            options:{new:false}
+        })
+        if(!deleted){
+            throw new Notfound("friend request not found")
+        }
+        await FriendRequestModel.deleteOne({_id:requestId})
+        return res.status(200).json({message:"friend request deleted"})
+    }
+
+    unFriend=async(req:Request,res:Response):Promise<Response>=>{
+        const {userId}=req.params as unknown as {userId:Types.ObjectId}
+        if(!Types.ObjectId.isValid(userId as any)){
+            throw new Notfound("Invalid user id")
+        }
+        await Promise.all([
+            this.userModel.updateOne({filter:{_id:req.user?._id},update:{$pull:{friends:userId}}}),
+            this.userModel.updateOne({filter:{_id:userId},update:{$pull:{friends:req.user?._id}}})
+        ])
+        return res.status(200).json({message:"unfriended successfully"})
+    }
+
     updateEmail=async(req:Request,res:Response):Promise<Response>=>{
         const {email}:IUpdateEmailDto=req.body
         
@@ -199,6 +228,22 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
                 user: updatedUser
             }
         })
+    }
+
+    blockUser=async(req:Request,res:Response):Promise<Response>=>{
+        const {userId}=req.params as unknown as {userId:Types.ObjectId}
+        if(!Types.ObjectId.isValid(userId as any)){
+            throw new Notfound("Invalid user id")
+        }
+        const user=await this.userModel.findOne({filter:{_id:userId}})
+        if(!user){
+            throw new Notfound("user not found")
+        }
+        await this.userModel.updateOne({
+            filter:{_id:req.user?._id},
+            update:{$addToSet:{blocked:userId}}
+        })
+        return res.status(200).json({message:"user blocked"})
     }
 
  }

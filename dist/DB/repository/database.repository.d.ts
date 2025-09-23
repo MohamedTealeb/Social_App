@@ -2,7 +2,7 @@ import { CreateOptions, HydratedDocument, Model, MongooseUpdateQueryOptions, Pro
 export declare abstract class DataBaseRepository<TDocument> {
     protected readonly model: Model<TDocument>;
     constructor(model: Model<TDocument>);
-    findOne({ filter, select }: {
+    findOne({ filter, select, options }: {
         filter?: RootFilterQuery<TDocument>;
         select?: ProjectionType<TDocument> | null;
         options?: QueryOptions<TDocument> | null;

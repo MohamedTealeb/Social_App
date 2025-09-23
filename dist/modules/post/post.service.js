@@ -159,6 +159,77 @@ class PostService {
             ...posts
         });
     };
+    getPostById = async (req, res) => {
+        const { postId } = req.params;
+        if (!postId) {
+            throw new error_response_1.Notfound("Post ID is required");
+        }
+        if (!mongoose_1.Types.ObjectId.isValid(postId)) {
+            throw new error_response_1.Notfound("Invalid Post ID format");
+        }
+        const post = await this.postModel.findOne({
+            filter: { _id: new mongoose_1.Types.ObjectId(postId), $or: (0, exports.postAvailability)(req) },
+            options: { populate: [{ path: "comments" }] }
+        });
+        if (!post) {
+            throw new error_response_1.Notfound("Post not found");
+        }
+        return res.status(200).json({
+            success: true,
+            post
+        });
+    };
+    freezePost = async (req, res) => {
+        const { postId } = req.params;
+        if (!postId) {
+            throw new error_response_1.Notfound("Post ID is required");
+        }
+        if (!mongoose_1.Types.ObjectId.isValid(postId)) {
+            throw new error_response_1.Notfound("Invalid Post ID format");
+        }
+        const existingPost = await this.postModel.findOne({
+            filter: { _id: new mongoose_1.Types.ObjectId(postId) }
+        });
+        if (!existingPost) {
+            throw new error_response_1.Notfound("Post not found");
+        }
+        const updatedPost = await this.postModel.findByIdAndUpdate({
+            id: new mongoose_1.Types.ObjectId(postId),
+            update: {
+                freezedBy: new mongoose_1.Types.ObjectId(req.user?._id),
+                freezedAt: new Date(),
+                restoredAt: undefined,
+                restoredBy: undefined
+            },
+            options: { new: true }
+        });
+        return res.status(200).json({
+            success: true,
+            message: "Post freezed successfully",
+            post: updatedPost
+        });
+    };
+    hardDeletePost = async (req, res) => {
+        const { postId } = req.params;
+        if (!postId) {
+            throw new error_response_1.Notfound("Post ID is required");
+        }
+        if (!mongoose_1.Types.ObjectId.isValid(postId)) {
+            throw new error_response_1.Notfound("Invalid Post ID format");
+        }
+        const existingPost = await this.postModel.findOne({
+            filter: { _id: new mongoose_1.Types.ObjectId(postId) }
+        });
+        if (!existingPost) {
+            throw new error_response_1.Notfound("Post not found");
+        }
+        await comment_model_1.CommentModel.deleteMany({ postId: new mongoose_1.Types.ObjectId(postId) });
+        await post_model_1.PostModel.deleteOne({ _id: new mongoose_1.Types.ObjectId(postId) });
+        return res.status(200).json({
+            success: true,
+            message: "Post deleted permanently"
+        });
+    };
 }
 exports.default = new PostService();
 //# sourceMappingURL=post.service.js.map

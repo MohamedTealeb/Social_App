@@ -10,6 +10,7 @@ const post_model_1 = require("./../../DB/model/post.model");
 const post_repository_1 = require("../../DB/repository/post.repository");
 const friendRequest_repository_1 = require("../../DB/repository/friendRequest.repository");
 const friendRequest_model_1 = require("../../DB/model/friendRequest.model");
+const mongoose_1 = require("mongoose");
 const error_response_1 = require("../../utils/response/error.response");
 class UserService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
@@ -154,6 +155,33 @@ class UserService {
             res: FriendRequest
         });
     };
+    deleteFriendRequest = async (req, res) => {
+        const { requestId } = req.params;
+        const deleted = await this.friendRequestModel.findOneAndUpdate({
+            filter: {
+                _id: requestId,
+                $or: [{ createdBy: req.user?._id }, { sendTo: req.user?._id }]
+            },
+            update: { acceptedAt: undefined },
+            options: { new: false }
+        });
+        if (!deleted) {
+            throw new error_response_1.Notfound("friend request not found");
+        }
+        await friendRequest_model_1.FriendRequestModel.deleteOne({ _id: requestId });
+        return res.status(200).json({ message: "friend request deleted" });
+    };
+    unFriend = async (req, res) => {
+        const { userId } = req.params;
+        if (!mongoose_1.Types.ObjectId.isValid(userId)) {
+            throw new error_response_1.Notfound("Invalid user id");
+        }
+        await Promise.all([
+            this.userModel.updateOne({ filter: { _id: req.user?._id }, update: { $pull: { friends: userId } } }),
+            this.userModel.updateOne({ filter: { _id: userId }, update: { $pull: { friends: req.user?._id } } })
+        ]);
+        return res.status(200).json({ message: "unfriended successfully" });
+    };
     updateEmail = async (req, res) => {
         const { email } = req.body;
         const existingUser = await this.userModel.findOne({ filter: { email } });
@@ -174,6 +202,21 @@ class UserService {
                 user: updatedUser
             }
         });
+    };
+    blockUser = async (req, res) => {
+        const { userId } = req.params;
+        if (!mongoose_1.Types.ObjectId.isValid(userId)) {
+            throw new error_response_1.Notfound("Invalid user id");
+        }
+        const user = await this.userModel.findOne({ filter: { _id: userId } });
+        if (!user) {
+            throw new error_response_1.Notfound("user not found");
+        }
+        await this.userModel.updateOne({
+            filter: { _id: req.user?._id },
+            update: { $addToSet: { blocked: userId } }
+        });
+        return res.status(200).json({ message: "user blocked" });
     };
 }
 exports.default = new UserService();

@@ -10,8 +10,11 @@ const comment_controller_1 = __importDefault(require("../comment/comment.control
 const router = (0, express_1.Router)();
 router.use("/:postId/comment", (0, authentication_middlewar_1.authentication)(), comment_controller_1.default);
 router.get("/", (0, authentication_middlewar_1.authentication)(), post_service_1.default.postList);
+router.get("/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.getPostById);
 router.post("/add", (0, authentication_middlewar_1.authentication)(), post_service_1.default.createPost);
 router.patch("/like/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.likePost);
 router.patch("/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.updatePost);
+router.patch("/freeze/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.freezePost);
+router.delete("/hard/:postId", (0, authentication_middlewar_1.authentication)(), post_service_1.default.hardDeletePost);
 exports.default = router;
 //# sourceMappingURL=post.controller.js.map

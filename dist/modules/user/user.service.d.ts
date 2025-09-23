@@ -11,7 +11,10 @@ declare class UserService {
     refreshToken: (req: Request, res: Response) => Promise<Response>;
     friendRequest: (req: Request, res: Response) => Promise<Response>;
     acceptFriendRequest: (req: Request, res: Response) => Promise<Response>;
+    deleteFriendRequest: (req: Request, res: Response) => Promise<Response>;
+    unFriend: (req: Request, res: Response) => Promise<Response>;
     updateEmail: (req: Request, res: Response) => Promise<Response>;
+    blockUser: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: UserService;
 export default _default;

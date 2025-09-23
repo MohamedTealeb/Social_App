@@ -33,6 +33,7 @@ export interface IUser {
     updatedAt?: Date;
     profileImage?: string;
     coverImages?: string[];
+    blocked?: Types.ObjectId[];
 }
 export declare const UserModel: import("mongoose").Model<any, {}, {}, {}, any, any> | import("mongoose").Model<IUser, {}, {}, {}, import("mongoose").Document<unknown, {}, IUser, {}, {}> & IUser & Required<{
     _id: Types.ObjectId;

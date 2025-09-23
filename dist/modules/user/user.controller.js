@@ -49,9 +49,12 @@ router.get("/", (0, authentication_middlewar_1.authentication)(), user_service_1
 router.get("/dashboard", (0, authentication_middlewar_1.authorization)(user_authorization_1.endpoint.dashboard), user_service_1.default.dashboard);
 router.post("/:userId/send-friend-request", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.friendRequest), user_service_1.default.friendRequest);
 router.patch("/accept-friend-request/:requestId", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.acceptFriendRequest), user_service_1.default.acceptFriendRequest);
+router.delete("/friend-request/:requestId", (0, authentication_middlewar_1.authentication)(), user_service_1.default.deleteFriendRequest);
+router.delete("/unfriend/:userId", (0, authentication_middlewar_1.authentication)(), user_service_1.default.unFriend);
 router.patch("/profile-image", (0, authentication_middlewar_1.authentication)(), (0, cloud_multer_1.cloudFileUpload)({ validation: cloud_multer_1.fileValidation.image, storageApproach: cloud_multer_1.storaeEnum.disk }).single("image"), user_service_1.default.profileImage);
 router.post("/refresh-token", (0, authentication_middlewar_1.authentication)(token_security_1.TokenEnum.refresh), user_service_1.default.refreshToken);
 router.post("/logout", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.logout), user_service_1.default.logout);
 router.patch("/update-email", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.updateEmail), user_service_1.default.updateEmail);
+router.patch("/block/:userId", (0, authentication_middlewar_1.authentication)(), user_service_1.default.blockUser);
 exports.default = router;
 //# sourceMappingURL=user.controller.js.map

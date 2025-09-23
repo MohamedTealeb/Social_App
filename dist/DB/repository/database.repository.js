@@ -6,8 +6,11 @@ class DataBaseRepository {
     constructor(model) {
         this.model = model;
     }
-    async findOne({ filter, select }) {
-        return await this.model.findOne(filter).select(select || "");
+    async findOne({ filter, select, options }) {
+        let query = this.model.findOne(filter ?? {}, null, options ?? undefined).select(select || "");
+        if (options?.populate)
+            query = query.populate(options.populate);
+        return await query;
     }
     async paginte({ filter = {}, options = {}, select, page = 1, size = 5, }) {
         let decsCount = undefined;

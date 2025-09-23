@@ -195,6 +195,101 @@ class PostService {
       });
     }
 
+    getPostById = async (req: Request, res: Response): Promise<Response> => {
+      const { postId } = req.params as unknown as { postId: Types.ObjectId };
+
+      if (!postId) {
+        throw new Notfound("Post ID is required");
+      }
+      if (!Types.ObjectId.isValid(postId)) {
+        throw new Notfound("Invalid Post ID format");
+      }
+
+      const post = await this.postModel.findOne({
+        filter: { _id: new Types.ObjectId(postId), $or: postAvailability(req) },
+        options: { populate: [{ path: "comments" }] }
+      });
+
+      if (!post) {
+        throw new Notfound("Post not found");
+      }
+
+      return res.status(200).json({
+        success: true,
+        post
+      });
+    }
+
+    freezePost = async (req: Request, res: Response): Promise<Response> => {
+        const { postId } = req.params;
+        
+
+        if (!postId) {
+            throw new Notfound("Post ID is required");
+        }
+       
+        if (!Types.ObjectId.isValid(postId)) {
+            throw new Notfound("Invalid Post ID format");
+        }
+        
+
+        const existingPost = await this.postModel.findOne({
+            filter: { _id: new Types.ObjectId(postId) }
+        });
+        if (!existingPost) {
+            throw new Notfound("Post not found");
+        }
+
+      
+        const updatedPost = await this.postModel.findByIdAndUpdate({
+            id: new Types.ObjectId(postId),
+            update: {
+                freezedBy: new Types.ObjectId(req.user?._id),
+                freezedAt: new Date(),
+                restoredAt: undefined,
+                restoredBy: undefined
+            },
+            options: { new: true }
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Post freezed successfully",
+            post: updatedPost
+        });
+    }
+
+    hardDeletePost = async (req: Request, res: Response): Promise<Response> => {
+        const { postId } = req.params;
+      
+
+        if (!postId) {
+            throw new Notfound("Post ID is required");
+        }
+        
+        if (!Types.ObjectId.isValid(postId)) {
+            throw new Notfound("Invalid Post ID format");
+        }
+       
+
+        const existingPost = await this.postModel.findOne({
+            filter: { _id: new Types.ObjectId(postId) }
+        });
+        if (!existingPost) {
+            throw new Notfound("Post not found");
+        }
+
+    
+
+        await CommentModel.deleteMany({ postId: new Types.ObjectId(postId) });
+        await PostModel.deleteOne({ _id: new Types.ObjectId(postId) });
+
+        return res.status(200).json({
+            success: true,
+            message: "Post deleted permanently"
+        });
+    }
+
 }
 
 export default new PostService();

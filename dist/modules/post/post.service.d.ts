@@ -25,6 +25,9 @@ declare class PostService {
     likePost: (req: Request, res: Response) => Promise<Response>;
     updatePost: (req: Request, res: Response) => Promise<Response>;
     postList: (req: Request, res: Response) => Promise<Response>;
+    getPostById: (req: Request, res: Response) => Promise<Response>;
+    freezePost: (req: Request, res: Response) => Promise<Response>;
+    hardDeletePost: (req: Request, res: Response) => Promise<Response>;
 }
 declare const _default: PostService;
 export default _default;

@@ -3,11 +3,18 @@ import { CreateOptions, HydratedDocument, Model, MongooseUpdateQueryOptions, Pro
 export abstract class DataBaseRepository<TDocument>{
     constructor(protected readonly model:Model<TDocument>){}
 
-async findOne({filter,select}:
-    {filter?:RootFilterQuery<TDocument>,
-        select?:ProjectionType<TDocument>|null,
-        options?:QueryOptions<TDocument>|null}):Promise<HydratedDocument<TDocument>|null>{
-    return await this.model.findOne(filter).select(select||"")
+async findOne({
+    filter,
+    select,
+    options
+  }:{
+    filter?:RootFilterQuery<TDocument>,
+    select?:ProjectionType<TDocument>|null,
+    options?:QueryOptions<TDocument>|null
+  }):Promise<HydratedDocument<TDocument>|null>{
+    let query = this.model.findOne(filter ?? {}, null, options ?? undefined).select(select||"");
+    if (options?.populate) query = query.populate(options.populate as any);
+    return await query as unknown as HydratedDocument<TDocument> | null;
 }
 async paginte({
     filter={},
