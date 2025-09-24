@@ -11,7 +11,8 @@ import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
 import { globalErrorHandling } from './utils/response/error.response';
 import connectDB from './DB/connections.db';
-
+import { Server } from 'socket.io';
+const connectedSocket: string[] = []
 const bootstrap=async():Promise<void>=>{
 const port:number|string=process.env.PORT||5000;
 const app:Express=express()
@@ -52,8 +53,38 @@ await connectDB()
    
    
 // }
-app.listen(port,()=>{
+ const httpServer=app.listen(port,()=>{
 console.log(`Server is running on port ${port} `);})
+
+const io=new Server(httpServer,{
+   cors:{
+      origin:["http://127.0.0.1:8080","http://127.0.0.1:62851"],
+   }
+})
+
+io.on('connection',(socket)=>{
+   console.log("A user connected");
+   connectedSocket.push(socket.id)
+
+   socket.on("sayHi",(data)=>{
+      console.log("A user sent a message",{data});
+      socket.
+      // to(connectedSocket[connectedSocket.length]as string)
+      
+      emit("sayHi","BE to FE")
+   })
+   console.log(socket.id);
+   socket.on('disconnect',()=>{
+      console.log("A user disconnected",socket.id);
+   })
+
+   
+   
+   
+})
+
+
+
 }
 
 export default bootstrap

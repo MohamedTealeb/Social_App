@@ -15,6 +15,8 @@ const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
 const connections_db_1 = __importDefault(require("./DB/connections.db"));
+const socket_io_1 = require("socket.io");
+const connectedSocket = [];
 const bootstrap = async () => {
     const port = process.env.PORT || 5000;
     const app = (0, express_1.default)();
@@ -48,8 +50,27 @@ const bootstrap = async () => {
     //hoooks
     // async function test() {
     // }
-    app.listen(port, () => {
+    const httpServer = app.listen(port, () => {
         console.log(`Server is running on port ${port} `);
+    });
+    const io = new socket_io_1.Server(httpServer, {
+        cors: {
+            origin: ["http://127.0.0.1:8080", "http://127.0.0.1:62851"],
+        }
+    });
+    io.on('connection', (socket) => {
+        console.log("A user connected");
+        connectedSocket.push(socket.id);
+        socket.on("sayHi", (data) => {
+            console.log("A user sent a message", { data });
+            socket.
+                // to(connectedSocket[connectedSocket.length]as string)
+                emit("sayHi", "BE to FE");
+        });
+        console.log(socket.id);
+        socket.on('disconnect', () => {
+            console.log("A user disconnected", socket.id);
+        });
     });
 };
 exports.default = bootstrap;
