@@ -48,12 +48,15 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
             }
         });
 
-        const friends = friendRequests.map(request => {
-            if (request.createdBy._id.toString() === req.user?._id.toString()) {
-                return request.sendTo;
-            }
-            return request.createdBy;
-        });
+        const me = req.user?._id?.toString() || "";
+        const friends = friendRequests
+            .map(request => {
+                const createdBy: any = (request as any).createdBy || null;
+                const sendTo: any = (request as any).sendTo || null;
+                const createdById = createdBy?._id?.toString?.() ?? createdBy?.toString?.();
+                return createdById === me ? sendTo : createdBy;
+            })
+            .filter(Boolean);
 
         return res.json({
             message:"Done",
