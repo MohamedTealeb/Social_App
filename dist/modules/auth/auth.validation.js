@@ -25,7 +25,7 @@ exports.login = {
     body: zod_1.z.strictObject({
         email: validation_middleware_1.generalFields.email,
         password: validation_middleware_1.generalFields.password,
-        confirmPassword: validation_middleware_1.generalFields.confirmPassword,
+        //    confirmPassword:generalFields.confirmPassword,
     })
 };
 exports.confirmEmail = {

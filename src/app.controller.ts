@@ -9,10 +9,20 @@ import userController from './modules/user/user.controller'
 import postController from './modules/post/post.controller'
 import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
-import { globalErrorHandling } from './utils/response/error.response';
+import {  globalErrorHandling } from './utils/response/error.response';
 import connectDB from './DB/connections.db';
-import { Server } from 'socket.io';
-const connectedSocket: string[] = []
+import { Server, Socket } from 'socket.io';
+import { decodeToken, TokenEnum } from './utils/security/token.security';
+import { HUserDocument } from './DB/model/User.model';
+import { JwtPayload } from 'jsonwebtoken';
+const connectedSocket =new Map<string,string>();
+interface IAuthSocket extends Socket{
+
+   credentials?:{
+      user:Partial<HUserDocument>,
+      decoded:JwtPayload
+   }
+}
 const bootstrap=async():Promise<void>=>{
 const port:number|string=process.env.PORT||5000;
 const app:Express=express()
@@ -58,27 +68,45 @@ console.log(`Server is running on port ${port} `);})
 
 const io=new Server(httpServer,{
    cors:{
-      origin:["http://127.0.0.1:8080","http://127.0.0.1:62851"],
+      origin:"*",
    }
 })
+io.use(async(socket:IAuthSocket,next)=>{
+   try{
+ const {user,decoded}=
+ await decodeToken({
+   authorization:socket.handshake?.auth.authoriztion || "" ,
+   tokenType:TokenEnum.access
+ })
+ connectedSocket.set(user._id.toString(),socket.id)
+ socket.credentials={user,decoded}
+   next()
 
-io.on('connection',(socket)=>{
-   console.log("A user connected");
-   connectedSocket.push(socket.id)
 
-   socket.on("sayHi",(data)=>{
-      console.log("A user sent a message",{data});
-      socket.
-      // to(connectedSocket[connectedSocket.length]as string)
-      
-      emit("sayHi","BE to FE")
-   })
-   console.log(socket.id);
-   socket.on('disconnect',()=>{
-      console.log("A user disconnected",socket.id);
-   })
+      // next(new BadReauest("fail in authentication middleware"))
+   }catch(error:any){
+      next(error)
+   } 
 
-   
+})
+
+io.on('connection',(socket:IAuthSocket)=>{
+   // console.log("A user connected");
+   // console.log({connectedSocket})
+   // connectedSocket.push(socket.id)
+   console.log("public,socket",socket.credentials?.user._id?.toString());
+
+   socket.emit("sayHi", {
+    productId: "12345",
+    message: "Hello from server"
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+   connectedSocket.delete(socket.credentials?.user._id?.toString() as string)
+   io.emit("offline", { userId: socket.credentials?.user._id?.toString() });
+    console.log("A user disconnected:", socket.id);
+  });
    
    
 })

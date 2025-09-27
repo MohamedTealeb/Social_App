@@ -27,7 +27,7 @@ export const login={
     body:z.strictObject({
         email:generalFields.email,
         password:generalFields.password,
-       confirmPassword:generalFields.confirmPassword,
+    //    confirmPassword:generalFields.confirmPassword,
     })
 }
 export const confirmEmail={
