@@ -15,9 +15,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
 const connections_db_1 = __importDefault(require("./DB/connections.db"));
-const socket_io_1 = require("socket.io");
-const token_security_1 = require("./utils/security/token.security");
-const connectedSocket = new Map();
+const getway_1 = require("./modules/getway/getway");
 const bootstrap = async () => {
     const port = process.env.PORT || 5000;
     const app = (0, express_1.default)();
@@ -54,40 +52,7 @@ const bootstrap = async () => {
     const httpServer = app.listen(port, () => {
         console.log(`Server is running on port ${port} `);
     });
-    const io = new socket_io_1.Server(httpServer, {
-        cors: {
-            origin: "*",
-        }
-    });
-    io.use(async (socket, next) => {
-        try {
-            const { user, decoded } = await (0, token_security_1.decodeToken)({
-                authorization: socket.handshake?.auth.authoriztion || "",
-                tokenType: token_security_1.TokenEnum.access
-            });
-            connectedSocket.set(user._id.toString(), socket.id);
-            // next(new BadReauest("fail in authentication middleware"))
-        }
-        catch (error) {
-            next(error);
-        }
-    });
-    io.on('connection', (socket) => {
-        // console.log("A user connected");
-        console.log({ connectedSocket });
-        // connectedSocket.push(socket.id)
-        socket.on("sayHi", (data) => {
-            console.log("A user sent a message", { data });
-            socket.
-                // to(connectedSocket[connectedSocket.length]as string)
-                emit("sayHi", "BE to FE");
-        });
-        console.log(socket.id);
-        socket.on('disconnect', () => {
-            // connectedSocket.delete()
-            console.log("A user disconnected", socket.id);
-        });
-    });
+    (0, getway_1.initializeIo)(httpServer);
 };
 exports.default = bootstrap;
 //# sourceMappingURL=app.controller.js.map

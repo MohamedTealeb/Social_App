@@ -11,18 +11,8 @@ import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
 import {  globalErrorHandling } from './utils/response/error.response';
 import connectDB from './DB/connections.db';
-import { Server, Socket } from 'socket.io';
-import { decodeToken, TokenEnum } from './utils/security/token.security';
-import { HUserDocument } from './DB/model/User.model';
-import { JwtPayload } from 'jsonwebtoken';
-const connectedSocket =new Map<string,string>();
-interface IAuthSocket extends Socket{
+import { initializeIo } from './modules/getway/getway';
 
-   credentials?:{
-      user:Partial<HUserDocument>,
-      decoded:JwtPayload
-   }
-}
 const bootstrap=async():Promise<void>=>{
 const port:number|string=process.env.PORT||5000;
 const app:Express=express()
@@ -66,50 +56,7 @@ await connectDB()
  const httpServer=app.listen(port,()=>{
 console.log(`Server is running on port ${port} `);})
 
-const io=new Server(httpServer,{
-   cors:{
-      origin:"*",
-   }
-})
-io.use(async(socket:IAuthSocket,next)=>{
-   try{
- const {user,decoded}=
- await decodeToken({
-   authorization:socket.handshake?.auth.authoriztion || "" ,
-   tokenType:TokenEnum.access
- })
- connectedSocket.set(user._id.toString(),socket.id)
- socket.credentials={user,decoded}
-   next()
-
-
-      // next(new BadReauest("fail in authentication middleware"))
-   }catch(error:any){
-      next(error)
-   } 
-
-})
-
-io.on('connection',(socket:IAuthSocket)=>{
-   // console.log("A user connected");
-   // console.log({connectedSocket})
-   // connectedSocket.push(socket.id)
-   console.log("public,socket",socket.credentials?.user._id?.toString());
-
-   socket.emit("sayHi", {
-    productId: "12345",
-    message: "Hello from server"
-  });
-
-  // Handle disconnection
-  socket.on("disconnect", () => {
-   connectedSocket.delete(socket.credentials?.user._id?.toString() as string)
-   io.emit("offline", { userId: socket.credentials?.user._id?.toString() });
-    console.log("A user disconnected:", socket.id);
-  });
-   
-   
-})
+initializeIo(httpServer)
 
 
 
