@@ -20,10 +20,22 @@ const initializeIo = (httpServer) => {
                 tokenType: token_security_1.TokenEnum.access
             });
             const usertaps = exports.connectedSocket.get(user._id.toString()) || [];
+            const isFirstConnection = usertaps.length === 0;
             usertaps.push(socket.id);
             console.log({ usertaps });
             exports.connectedSocket.set(user._id.toString(), usertaps);
             socket.credentials = { user, decoded };
+            if (isFirstConnection) {
+                (0, exports.getIo)().emit("user_online", {
+                    userId: user._id.toString(),
+                    user: {
+                        _id: user._id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        profileImage: user.profileImage
+                    }
+                });
+            }
             next();
             // next(new BadReauest("fail in authentication middleware"))
         }
@@ -34,7 +46,6 @@ const initializeIo = (httpServer) => {
     // disconnection
     function disconnection(socket) {
         return socket.on("disconnect", () => {
-            // connectedSocket.delete(socket.credentials?.user._id?.toString() as string)
             const userId = socket.credentials?.user._id?.toString();
             let reminingTabs = exports.connectedSocket.get(userId)?.filter((tab) => {
                 return tab !== socket.id;
@@ -44,10 +55,17 @@ const initializeIo = (httpServer) => {
             }
             else {
                 exports.connectedSocket.delete(userId);
-                (0, exports.getIo)().emit("offline_user", userId);
+                (0, exports.getIo)().emit("user_offline", {
+                    userId: userId,
+                    user: {
+                        _id: socket.credentials?.user._id,
+                        firstName: socket.credentials?.user.firstName,
+                        lastName: socket.credentials?.user.lastName,
+                        profileImage: socket.credentials?.user.profileImage
+                    }
+                });
             }
             console.log({ after_Disconnect: exports.connectedSocket });
-            (0, exports.getIo)().emit("offline_user", { userId: socket.credentials?.user._id?.toString() });
             console.log("A user disconnected:", socket.id);
         });
     }

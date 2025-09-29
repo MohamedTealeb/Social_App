@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 declare class UserService {
     private userModel;
+    private CHatModel;
     private postModel;
     private friendRequestModel;
     constructor();

@@ -12,8 +12,11 @@ const friendRequest_repository_1 = require("../../DB/repository/friendRequest.re
 const friendRequest_model_1 = require("../../DB/model/friendRequest.model");
 const mongoose_1 = require("mongoose");
 const error_response_1 = require("../../utils/response/error.response");
+const chat_model_1 = require("./../../DB/model/chat.model");
+const chat_repository_1 = require("../../DB/repository/chat.repository");
 class UserService {
     userModel = new user_reository_1.UserRepository(User_model_1.UserModel);
+    CHatModel = new chat_repository_1.ChatRepository(chat_model_1.CHatModel);
     postModel = new post_repository_1.PostRepository(post_model_1.PostModel);
     friendRequestModel = new friendRequest_repository_1.FriendRequestRepository(friendRequest_model_1.FriendRequestModel);
     // private tokenModel=new TokenRepository(TokenModel)
@@ -46,11 +49,18 @@ class UserService {
             return createdById === me ? sendTo : createdBy;
         })
             .filter(Boolean);
+        const groups = await this.CHatModel.find({
+            filter: {
+                participants: { $in: [req.user?._id] },
+                group: { $exists: true, $nin: [null, ""] }
+            }
+        });
         return res.json({
             message: "Done",
             date: {
                 user: profile,
-                friends: friends
+                friends: friends,
+                groups: groups
             }
         });
     };

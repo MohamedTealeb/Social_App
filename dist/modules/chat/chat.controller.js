@@ -41,5 +41,7 @@ const chat_service_1 = require("./chat.service");
 const router = (0, express_1.Router)({ mergeParams: true });
 const chatService = new chat_service_1.ChatService();
 router.get("/", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(Validators.getChat), chatService.getChat);
+router.get("/group/:groupId", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(Validators.getChatgroup), chatService.getChatgroup);
+router.post("/group", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(Validators.createGroup), chatService.createGroup);
 exports.default = router;
 //# sourceMappingURL=chat.controller.js.map

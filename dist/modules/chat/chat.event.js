@@ -15,6 +15,21 @@ class ChatEvent {
             this.chatService.sendMessage({ ...data, socket, io });
         });
     };
+    joinRoom = (socket, io) => {
+        return socket.on("join_room", (data) => {
+            this.chatService.joinRoom({ ...data, socket, io });
+        });
+    };
+    sendGroupMessage = (socket, io) => {
+        return socket.on("sendGroupMessage", (data) => {
+            this.chatService.sendGroupMessage({ ...data, socket, io });
+        });
+    };
+    handleTyping = (socket, io) => {
+        return socket.on("typing", (data) => {
+            this.chatService.handleTyping({ ...data, socket, io });
+        });
+    };
 }
 exports.ChatEvent = ChatEvent;
 //# sourceMappingURL=chat.event.js.map

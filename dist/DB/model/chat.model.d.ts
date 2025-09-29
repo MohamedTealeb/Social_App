@@ -1,6 +1,6 @@
 import { HydratedDocument, Types } from "mongoose";
 export interface IMessage {
-    contnet: string;
+    content: string;
     createdBy: Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;

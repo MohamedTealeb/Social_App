@@ -16,7 +16,7 @@ export const initializeIo=(httpServer:HttpServer)=>{
       origin:"*",
    }
 })
-getIo().use(async(socket:IAuthSocket,next)=>{
+ getIo().use(async(socket:IAuthSocket,next)=>{
    try{
  const {user,decoded}=
  await decodeToken({
@@ -24,11 +24,24 @@ getIo().use(async(socket:IAuthSocket,next)=>{
    tokenType:TokenEnum.access
  })
  const usertaps=connectedSocket.get(user._id.toString())||[]
+ const isFirstConnection = usertaps.length === 0;
  usertaps.push(socket.id)
  console.log({usertaps});
  
  connectedSocket.set(user._id.toString(),usertaps)
  socket.credentials={user,decoded}
+
+ if (isFirstConnection) {
+   getIo().emit("user_online", { 
+     userId: user._id.toString(),
+     user: {
+       _id: user._id,
+       firstName: user.firstName,
+       lastName: user.lastName,
+       profileImage: user.profileImage
+     }
+   });
+ }
    next()
 
 
@@ -42,24 +55,29 @@ getIo().use(async(socket:IAuthSocket,next)=>{
 // disconnection
 function disconnection(socket:IAuthSocket){
     return   socket.on("disconnect", () => {
-   // connectedSocket.delete(socket.credentials?.user._id?.toString() as string)
-   const userId=socket.credentials?.user._id?.toString() as string
-   let reminingTabs=connectedSocket.get(userId)?.filter((tab:string)=>{
+  const userId=socket.credentials?.user._id?.toString() as string
+  let reminingTabs=connectedSocket.get(userId)?.filter((tab:string)=>{
 return tab!==socket.id
-   })||[]
-   if(reminingTabs?.length){
-      connectedSocket.set(userId,reminingTabs)
-   }
-   else{
-      connectedSocket.delete(userId)
-      getIo().emit("offline_user", userId);
-   }
-   
-   console.log({after_Disconnect:connectedSocket});
-   
-   getIo().emit("offline_user", { userId: socket.credentials?.user._id?.toString() });
-    console.log("A user disconnected:", socket.id);
-  });
+  })||[]
+  if(reminingTabs?.length){
+     connectedSocket.set(userId,reminingTabs)
+  }
+  else{
+     connectedSocket.delete(userId)
+     getIo().emit("user_offline", { 
+       userId: userId,
+       user: {
+         _id: socket.credentials?.user._id,
+         firstName: socket.credentials?.user.firstName,
+         lastName: socket.credentials?.user.lastName,
+         profileImage: socket.credentials?.user.profileImage
+       }
+     });
+  }
+  
+  console.log({after_Disconnect:connectedSocket});
+   console.log("A user disconnected:", socket.id);
+ });
 
 
 }

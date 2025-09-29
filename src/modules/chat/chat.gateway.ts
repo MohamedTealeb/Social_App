@@ -13,6 +13,9 @@ constructor(){}
 register=(socket:IAuthSocket,io:Server)=>{
     this.ChatEvent.sayHi(socket,io)
     this.ChatEvent.sendMessage(socket,io)
+    this.ChatEvent.joinRoom(socket,io)
+    this.ChatEvent.sendGroupMessage(socket,io)
+    this.ChatEvent.handleTyping(socket,io)
    
 }
 

@@ -7,6 +7,7 @@ import cors from 'cors'
 import authController from'./modules/auth/auth.controller';
 import userController from './modules/user/user.controller'
 import postController from './modules/post/post.controller'
+import chatController from './modules/chat/chat.controller'
 import helmet from 'helmet';
 import {rateLimit}from 'express-rate-limit';
 import {  globalErrorHandling } from './utils/response/error.response';
@@ -37,6 +38,7 @@ app.get('/',(req:Request,res:Response,next:NextFunction)=>{
 app.use("/auth",authController)
 app.use("/user",userController)
 app.use("/post",postController)
+app.use("/chat",chatController)
 app.use('{/*dummy}',(req:Request,res:Response,next:NextFunction)=>{
    return res.status(404).json({
       error:"Not Found",

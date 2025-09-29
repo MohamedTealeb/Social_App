@@ -15,11 +15,14 @@ import { FriendRequestRepository } from "../../DB/repository/friendRequest.repos
 import { FriendRequestModel } from "../../DB/model/friendRequest.model";
 import { Types } from "mongoose";
 import { BadReauest, ConflictException, Notfound } from "../../utils/response/error.response"
+import { CHatModel } from './../../DB/model/chat.model';
+import { ChatRepository } from "../../DB/repository/chat.repository";
  
 
 
  class UserService {
     private userModel=new UserRepository(UserModel)
+    private CHatModel=new ChatRepository(CHatModel)
     private postModel=new PostRepository(PostModel)
     private friendRequestModel=new FriendRequestRepository(FriendRequestModel)
     // private tokenModel=new TokenRepository(TokenModel)
@@ -57,12 +60,18 @@ import { BadReauest, ConflictException, Notfound } from "../../utils/response/er
                 return createdById === me ? sendTo : createdBy;
             })
             .filter(Boolean);
-
+   const groups = await this.CHatModel.find({
+    filter: {
+        participants: { $in: [req.user?._id as Types.ObjectId] },
+        group: { $exists: true, $nin: [null as any, ""] }
+    }
+   })
         return res.json({
             message:"Done",
             date:{
                 user: profile,
-                friends: friends
+                friends: friends,
+                groups: groups
             }
         })
     }
