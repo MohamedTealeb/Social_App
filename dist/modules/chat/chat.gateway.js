@@ -7,6 +7,7 @@ class ChatGateway {
     constructor() { }
     register = (socket, io) => {
         this.ChatEvent.sayHi(socket, io);
+        this.ChatEvent.sendMessage(socket, io);
     };
 }
 exports.ChatGateway = ChatGateway;

@@ -5,7 +5,7 @@ import { decodeToken,TokenEnum } from '../../utils/security/token.security';
 import {IAuthSocket} from './getway.interface';
 import { ChatGateway } from '../chat/chat.gateway';
 import { BadReauest } from '../../utils/response/error.response';
-const connectedSocket =new Map<string,string[]>();
+export const connectedSocket =new Map<string,string[]>();
 let io:undefined|Server=undefined
 
 export const initializeIo=(httpServer:HttpServer)=>{

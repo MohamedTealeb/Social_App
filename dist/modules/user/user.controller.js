@@ -44,7 +44,9 @@ const validation_middleware_1 = require("../../middleware/validation.middleware"
 const token_security_1 = require("../../utils/security/token.security");
 const cloud_multer_1 = require("../../utils/multer/cloud.multer");
 const user_authorization_1 = require("./user.authorization");
+const chat_controller_1 = __importDefault(require("../../modules/chat/chat.controller"));
 const router = (0, express_1.Router)();
+router.use("/:userId/chat", chat_controller_1.default);
 router.get("/", (0, authentication_middlewar_1.authentication)(), user_service_1.default.profile);
 router.get("/dashboard", (0, authentication_middlewar_1.authorization)(user_authorization_1.endpoint.dashboard), user_service_1.default.dashboard);
 router.post("/:userId/send-friend-request", (0, authentication_middlewar_1.authentication)(), (0, validation_middleware_1.validation)(validator.friendRequest), user_service_1.default.friendRequest);

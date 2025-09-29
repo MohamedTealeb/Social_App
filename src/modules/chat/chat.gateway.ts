@@ -12,6 +12,7 @@ constructor(){}
 
 register=(socket:IAuthSocket,io:Server)=>{
     this.ChatEvent.sayHi(socket,io)
+    this.ChatEvent.sendMessage(socket,io)
    
 }
 

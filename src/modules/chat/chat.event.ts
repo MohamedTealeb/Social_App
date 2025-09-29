@@ -16,6 +16,14 @@ sayHi=(socket:IAuthSocket,io:Server)=>{
     })
 }
 
+sendMessage=(socket:IAuthSocket,io:Server)=>{
+    return socket.on("sendMessage",(data:{content:string; sendTo:string})=>{
+        this.chatService.sendMessage({...data,socket,io})
+      
+        
+    })
+}
+
 
 
 }

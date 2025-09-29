@@ -10,6 +10,11 @@ class ChatEvent {
             this.chatService.sayHi({ message, socket, callback, io });
         });
     };
+    sendMessage = (socket, io) => {
+        return socket.on("sendMessage", (data) => {
+            this.chatService.sendMessage({ ...data, socket, io });
+        });
+    };
 }
 exports.ChatEvent = ChatEvent;
 //# sourceMappingURL=chat.event.js.map

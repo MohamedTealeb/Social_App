@@ -6,9 +6,10 @@ import { validation } from "../../middleware/validation.middleware";
 import { TokenEnum } from '../../utils/security/token.security'
 import { cloudFileUpload, fileValidation, storaeEnum } from "../../utils/multer/cloud.multer";
 import { endpoint } from "./user.authorization";
+import chatRouter from "../../modules/chat/chat.controller"; 
 
  const router=Router()
-
+router.use("/:userId/chat",chatRouter)
 router.get("/",authentication(),userService.profile)
 router.get("/dashboard",authorization(endpoint.dashboard),userService.dashboard)
 router.post("/:userId/send-friend-request",authentication(),validation(validator.friendRequest),userService.friendRequest)

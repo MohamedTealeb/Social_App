@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIo = exports.initializeIo = void 0;
+exports.getIo = exports.initializeIo = exports.connectedSocket = void 0;
 const socket_io_1 = require("socket.io");
 const token_security_1 = require("../../utils/security/token.security");
 const chat_gateway_1 = require("../chat/chat.gateway");
 const error_response_1 = require("../../utils/response/error.response");
-const connectedSocket = new Map();
+exports.connectedSocket = new Map();
 let io = undefined;
 const initializeIo = (httpServer) => {
     io = new socket_io_1.Server(httpServer, {
@@ -19,10 +19,10 @@ const initializeIo = (httpServer) => {
                 authorization: socket.handshake?.auth.authorization || "",
                 tokenType: token_security_1.TokenEnum.access
             });
-            const usertaps = connectedSocket.get(user._id.toString()) || [];
+            const usertaps = exports.connectedSocket.get(user._id.toString()) || [];
             usertaps.push(socket.id);
             console.log({ usertaps });
-            connectedSocket.set(user._id.toString(), usertaps);
+            exports.connectedSocket.set(user._id.toString(), usertaps);
             socket.credentials = { user, decoded };
             next();
             // next(new BadReauest("fail in authentication middleware"))
@@ -36,17 +36,17 @@ const initializeIo = (httpServer) => {
         return socket.on("disconnect", () => {
             // connectedSocket.delete(socket.credentials?.user._id?.toString() as string)
             const userId = socket.credentials?.user._id?.toString();
-            let reminingTabs = connectedSocket.get(userId)?.filter((tab) => {
+            let reminingTabs = exports.connectedSocket.get(userId)?.filter((tab) => {
                 return tab !== socket.id;
             }) || [];
             if (reminingTabs?.length) {
-                connectedSocket.set(userId, reminingTabs);
+                exports.connectedSocket.set(userId, reminingTabs);
             }
             else {
-                connectedSocket.delete(userId);
+                exports.connectedSocket.delete(userId);
                 (0, exports.getIo)().emit("offline_user", userId);
             }
-            console.log({ after_Disconnect: connectedSocket });
+            console.log({ after_Disconnect: exports.connectedSocket });
             (0, exports.getIo)().emit("offline_user", { userId: socket.credentials?.user._id?.toString() });
             console.log("A user disconnected:", socket.id);
         });
