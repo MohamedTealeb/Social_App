@@ -17,6 +17,8 @@ const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
 const connections_db_1 = __importDefault(require("./DB/connections.db"));
 const getway_1 = require("./modules/getway/getway");
+const graphql_1 = require("graphql");
+const express_2 = require("graphql-http/lib/use/express");
 const bootstrap = async () => {
     const port = process.env.PORT || 5000;
     const app = (0, express_1.default)();
@@ -30,6 +32,20 @@ const bootstrap = async () => {
         statusCode: 429
     });
     app.use(limiter);
+    const schema = new graphql_1.GraphQLSchema({
+        query: new graphql_1.GraphQLObjectType({
+            name: "mainQueryName",
+            fields: {
+                sayHi: {
+                    type: graphql_1.GraphQLString,
+                    resolve: () => {
+                        return "Hello GraphQl";
+                    },
+                },
+            },
+        }),
+    });
+    app.all("/graphql", (0, express_2.createHandler)({ schema }));
     // Define your routes here
     app.get('/', (req, res, next) => {
         return res.status(200).json({

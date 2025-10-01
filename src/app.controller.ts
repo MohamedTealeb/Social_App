@@ -13,7 +13,8 @@ import {rateLimit}from 'express-rate-limit';
 import {  globalErrorHandling } from './utils/response/error.response';
 import connectDB from './DB/connections.db';
 import { initializeIo } from './modules/getway/getway';
-
+import {GraphQLObjectType, GraphQLSchema, GraphQLString} from 'graphql'
+import {createHandler}from "graphql-http/lib/use/express"
 const bootstrap=async():Promise<void>=>{
 const port:number|string=process.env.PORT||5000;
 const app:Express=express()
@@ -27,6 +28,20 @@ const limiter=rateLimit({
    statusCode:429
 })
 app.use(limiter)
+const schema=new GraphQLSchema({
+   query:new GraphQLObjectType({
+      name:"mainQueryName",
+      fields:{
+         sayHi:{
+            type:GraphQLString,
+            resolve:()=>{
+               return "Hello GraphQl"
+            },
+         },
+      },
+   }),
+});
+app.all("/graphql",createHandler({schema}))
 // Define your routes here
 app.get('/',(req:Request,res:Response,next:NextFunction)=>{
    return res.status(200).json({
