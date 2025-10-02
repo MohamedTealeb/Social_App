@@ -8,17 +8,18 @@ const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)({ path: (0, node_path_1.resolve)("./config/.env.development") });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
+const express_rate_limit_1 = require("express-rate-limit");
+const express_2 = require("graphql-http/lib/use/express");
 const auth_controller_1 = __importDefault(require("./modules/auth/auth.controller"));
 const user_controller_1 = __importDefault(require("./modules/user/user.controller"));
 const post_controller_1 = __importDefault(require("./modules/post/post.controller"));
 const chat_controller_1 = __importDefault(require("./modules/chat/chat.controller"));
-const helmet_1 = __importDefault(require("helmet"));
-const express_rate_limit_1 = require("express-rate-limit");
 const error_response_1 = require("./utils/response/error.response");
 const connections_db_1 = __importDefault(require("./DB/connections.db"));
 const getway_1 = require("./modules/getway/getway");
-const graphql_1 = require("graphql");
-const express_2 = require("graphql-http/lib/use/express");
+const schema_gql_1 = require("./modules/graphql/schema.gql");
+// Bootstrap
 const bootstrap = async () => {
     const port = process.env.PORT || 5000;
     const app = (0, express_1.default)();
@@ -32,21 +33,10 @@ const bootstrap = async () => {
         statusCode: 429
     });
     app.use(limiter);
-    const schema = new graphql_1.GraphQLSchema({
-        query: new graphql_1.GraphQLObjectType({
-            name: "mainQueryName",
-            fields: {
-                sayHi: {
-                    type: graphql_1.GraphQLString,
-                    resolve: () => {
-                        return "Hello GraphQl";
-                    },
-                },
-            },
-        }),
-    });
-    app.all("/graphql", (0, express_2.createHandler)({ schema }));
-    // Define your routes here
+    // GraphQL Schema
+    // GraphQL endpoint
+    app.all("/graphql", (0, express_2.createHandler)({ schema: schema_gql_1.schema }));
+    // REST routes
     app.get('/', (req, res, next) => {
         return res.status(200).json({
             message: "Welcome to the Social App API"
@@ -64,9 +54,6 @@ const bootstrap = async () => {
     });
     app.use(error_response_1.globalErrorHandling);
     await (0, connections_db_1.default)();
-    //hoooks
-    // async function test() {
-    // }
     const httpServer = app.listen(port, () => {
         console.log(`Server is running on port ${port} `);
     });
